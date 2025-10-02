@@ -1,0 +1,83 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "HelloWorld",
+  "sourceName": "contracts/HelloWorld.sol",
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "sender",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes",
+          "name": "data",
+          "type": "bytes"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "timestamp",
+          "type": "uint256"
+        }
+      ],
+      "name": "Interaction",
+      "type": "event"
+    },
+    {
+      "stateMutability": "payable",
+      "type": "fallback"
+    },
+    {
+      "inputs": [],
+      "name": "getBalance",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "totalInteractions",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "withdraw",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "stateMutability": "payable",
+      "type": "receive"
+    }
+  ],
+  "bytecode": "0x60808060405234610016576101d1908161001c8239f35b600080fdfe608060409080825260043610156100d4575b50361561008557610023600054610176565b60005580519060608252366060830152366000608084013760006080368401015234602083015242908201527f1214f91a37ccf8a9cf3ef1124a2daee47a4ef19b464f6d715ac62c0e3e5cf9663391608081601f19601f3601168101030190a2005b610090600054610176565b600055805190606082526000606083015234602083015242908201527f1214f91a37ccf8a9cf3ef1124a2daee47a4ef19b464f6d715ac62c0e3e5cf96660803392a2005b600090813560e01c90816312065fe01461015c575080633ccfd60b1461011e5763a843651e0361001157903461011a578160031936011261011a57602091549051908152f35b5080fd5b50903461011a578160031936011261011a578180808047818115610153575b3390f115610149575080f35b51903d90823e3d90fd5b506108fc61013d565b90503461011a578160031936011261011a57602090478152f35b60001981146101855760010190565b634e487b7160e01b600052601160045260246000fdfea264697066735822122021e9f9ad043ebe4c945553ee8dfaeead83fcb5eb142709cdab64f55eab080ee364736f6c63430008140033",
+  "deployedBytecode": "0x608060409080825260043610156100d4575b50361561008557610023600054610176565b60005580519060608252366060830152366000608084013760006080368401015234602083015242908201527f1214f91a37ccf8a9cf3ef1124a2daee47a4ef19b464f6d715ac62c0e3e5cf9663391608081601f19601f3601168101030190a2005b610090600054610176565b600055805190606082526000606083015234602083015242908201527f1214f91a37ccf8a9cf3ef1124a2daee47a4ef19b464f6d715ac62c0e3e5cf96660803392a2005b600090813560e01c90816312065fe01461015c575080633ccfd60b1461011e5763a843651e0361001157903461011a578160031936011261011a57602091549051908152f35b5080fd5b50903461011a578160031936011261011a578180808047818115610153575b3390f115610149575080f35b51903d90823e3d90fd5b506108fc61013d565b90503461011a578160031936011261011a57602090478152f35b60001981146101855760010190565b634e487b7160e01b600052601160045260246000fdfea264697066735822122021e9f9ad043ebe4c945553ee8dfaeead83fcb5eb142709cdab64f55eab080ee364736f6c63430008140033",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}
