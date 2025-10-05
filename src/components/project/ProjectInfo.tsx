@@ -47,16 +47,7 @@ export function ProjectInfo({ project, onEdit, isOwner }: ProjectInfoProps) {
         {/* Status and Category */}
         <div className="flex flex-wrap items-center gap-3 mb-6 pb-6 border-b border-white border-opacity-10">
           <CategoryBadge category={project.category || 'Other'} />
-          <BlockchainStatusBadge status={project.blockchain_status} />
-          {project.is_active ? (
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-500 bg-opacity-20 text-green-300 border border-green-400 border-opacity-30 backdrop-blur-sm">
-              Active
-            </span>
-          ) : (
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-500 bg-opacity-20 text-gray-300 border border-gray-400 border-opacity-30 backdrop-blur-sm">
-              Inactive
-            </span>
-          )}
+          <BlockchainStatusBadge status={project.blockchain_tx_hash ? 'confirmed' : 'pending'} />
         </div>
 
         {/* Description */}

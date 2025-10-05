@@ -34,7 +34,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
       {/* Badges */}
       <div className="flex items-center gap-2 mb-3">
         {project.category && <CategoryBadge category={project.category} />}
-        <BlockchainStatusBadge status={project.blockchain_status} />
+        <BlockchainStatusBadge status={project.blockchain_tx_hash ? 'confirmed' : 'pending'} />
       </div>
 
       {/* Stats */}

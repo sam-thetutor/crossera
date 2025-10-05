@@ -1,11 +1,15 @@
 'use client';
 
 interface BlockchainStatusBadgeProps {
-  status: 'pending' | 'confirmed' | 'failed';
+  status?: 'pending' | 'confirmed' | 'failed' | null;
   showIcon?: boolean;
 }
 
 export function BlockchainStatusBadge({ status, showIcon = true }: BlockchainStatusBadgeProps) {
+  // Handle undefined/null status
+  if (!status) {
+    status = 'pending';
+  }
   const getStatusStyles = () => {
     switch (status) {
       case 'confirmed':
@@ -46,7 +50,7 @@ export function BlockchainStatusBadge({ status, showIcon = true }: BlockchainSta
       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border backdrop-blur-sm ${styles.bg} ${styles.text} ${styles.border}`}
     >
       {showIcon && <span className="mr-1">{styles.icon}</span>}
-      {status.charAt(0).toUpperCase() + status.slice(1)}
+      {status ? status.charAt(0).toUpperCase() + status.slice(1) : 'Unknown'}
     </span>
   );
 }
