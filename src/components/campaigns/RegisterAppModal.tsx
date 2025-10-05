@@ -11,7 +11,7 @@ interface Project {
   app_id: string;
   app_name: string;
   category: string;
-  registered_on_chain: boolean;
+  blockchain_tx_hash?: string;
 }
 
 interface RegisterAppModalProps {
@@ -52,9 +52,9 @@ export function RegisterAppModal({
       const data = await response.json();
 
       if (data.success) {
-        // Filter only projects that are registered on-chain
+        // Filter only projects that are registered on-chain (have blockchain_tx_hash)
         const registeredProjects = (data.projects || []).filter(
-          (p: Project) => p.registered_on_chain
+          (p: Project) => p.blockchain_tx_hash
         );
         setProjects(registeredProjects);
         if (registeredProjects.length > 0) {
@@ -192,16 +192,22 @@ export function RegisterAppModal({
                   ) : projects.length === 0 ? (
                     <div className="text-center py-8">
                       <div className="text-4xl mb-2">📦</div>
-                      <p className="text-sm font-medium text-white mb-2">No registered apps found</p>
+                      <p className="text-sm font-medium text-white mb-2">No blockchain-registered apps found</p>
                       <p className="text-sm text-gray-300 mb-4">
-                        You need to register an app first before joining campaigns
+                        You have apps in the database, but they haven't been registered on the blockchain yet. 
+                        Please complete the blockchain registration process first.
                       </p>
-                      <a
-                        href="/register"
-                        className="inline-block px-4 py-2 glass-button text-white text-sm font-semibold rounded-lg hover:bg-white hover:bg-opacity-20 transition-all"
-                      >
-                        Register an App
-                      </a>
+                      <div className="space-y-3">
+                        <a
+                          href="/register"
+                          className="inline-block px-4 py-2 glass-button text-white text-sm font-semibold rounded-lg hover:bg-white hover:bg-opacity-20 transition-all"
+                        >
+                          Complete Blockchain Registration
+                        </a>
+                        <p className="text-xs text-gray-400">
+                          Or check your existing projects in the dashboard
+                        </p>
+                      </div>
                     </div>
                   ) : (
                     <>

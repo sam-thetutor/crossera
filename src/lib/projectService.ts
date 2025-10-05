@@ -256,6 +256,35 @@ export const projectService = {
     }
     
     return data || [];
+  },
+
+  /**
+   * Update blockchain status for a project
+   */
+  async updateBlockchainStatus(appId: string, txHash: string, status: string): Promise<Project> {
+    if (!supabaseAdmin) {
+      throw new Error('Supabase admin client not available');
+    }
+
+    const updateData: any = {};
+    
+    if (status === 'confirmed') {
+      updateData.blockchain_tx_hash = txHash;
+    }
+    
+    const { data, error } = await supabaseAdmin
+      .from('projects')
+      .update(updateData)
+      .eq('app_id', appId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating blockchain status:', error);
+      throw new Error(`Failed to update blockchain status: ${error.message}`);
+    }
+
+    return data;
   }
 };
 
