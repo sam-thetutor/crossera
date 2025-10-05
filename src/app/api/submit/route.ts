@@ -248,28 +248,31 @@ export async function POST(request: NextRequest) {
     });
 
     // Save transaction to database with user tracking data
-    const { data: savedTransaction, error: dbError } = await supabase
+    // Insert one transaction record for each registered campaign
+    const transactionInserts = registeredCampaigns.map((campaignId: number) => ({
+      tx_hash: transaction_hash,
+      app_id: appId,
+      project_id: projectId,
+      campaign_id: Number(campaignId),
+      from_address: tx.from,
+      to_address: tx.to,
+      user_address: userAddress,
+      amount: transactionValue.toString(),
+      gas_used: gasUsed.toString(),
+      gas_price: gasPrice.toString(),
+      fee_generated: feeGenerated.toString(),
+      block_number: receipt.blockNumber,
+      timestamp: new Date().toISOString(),
+      status: 'processed',
+      process_tx_hash: processReceipt.hash,
+      is_unique_user: isNewUniqueUser,
+      reward_calculated: finalReward.toString()
+    }));
+
+    const { data: savedTransactions, error: dbError } = await supabase
       .from('transactions')
-      .insert({
-        tx_hash: transaction_hash,
-        app_id: appId,
-        project_id: projectId,
-        from_address: tx.from,
-        to_address: tx.to,
-        user_address: userAddress,
-        amount: transactionValue.toString(),
-        gas_used: gasUsed.toString(),
-        gas_price: gasPrice.toString(),
-        fee_generated: feeGenerated.toString(),
-        block_number: receipt.blockNumber,
-        timestamp: new Date().toISOString(),
-        status: 'processed',
-        process_tx_hash: processReceipt.hash,
-        is_unique_user: isNewUniqueUser,
-        reward_calculated: finalReward.toString()
-      })
-      .select()
-      .single();
+      .insert(transactionInserts)
+      .select();
 
     if (dbError) {
       console.error('Database error:', dbError);
@@ -281,16 +284,21 @@ export async function POST(request: NextRequest) {
       registeredCampaigns.map(async (campaignId: number) => {
         const campaign = await contract.getCampaign(campaignId);
         const currentTime = Math.floor(Date.now() / 1000);
+        
+        // Convert Unix timestamps to numbers for comparison
+        const campaignStartTime = Number(campaign.startDate);
+        const campaignEndTime = Number(campaign.endDate);
+        
         const isCampaignActive = campaign.active && 
-                                currentTime >= Number(campaign.startDate) && 
-                                currentTime <= Number(campaign.endDate);
+                                currentTime >= campaignStartTime && 
+                                currentTime <= campaignEndTime;
         
         return {
           campaignId: Number(campaignId),
           isCampaignActive,
           campaignEnded: !isCampaignActive && campaign.active,
-          campaignStartDate: new Date(Number(campaign.startDate) * 1000).toISOString(),
-          campaignEndDate: new Date(Number(campaign.endDate) * 1000).toISOString()
+          campaignStartDate: new Date(campaignStartTime * 1000).toISOString(),
+          campaignEndDate: new Date(campaignEndTime * 1000).toISOString()
         };
       })
     );
@@ -299,9 +307,9 @@ export async function POST(request: NextRequest) {
     const activeCampaigns = campaignStatuses.filter(c => c.isCampaignActive);
     const endedCampaigns = campaignStatuses.filter(c => c.campaignEnded);
 
-    // Get updated metrics only for ACTIVE campaigns
+    // Get updated metrics for ALL registered campaigns (both active and ended)
     const campaignMetrics = await Promise.all(
-      activeCampaigns.map(async (campaignStatus) => {
+      campaignStatuses.map(async (campaignStatus) => {
         const metrics = await contract.getAppCampaignMetrics(appId, campaignStatus.campaignId);
         
         return {
@@ -310,7 +318,8 @@ export async function POST(request: NextRequest) {
           totalVolume: metrics.totalVolume.toString(),
           txCount: Number(metrics.txCount),
           estimatedReward: ethers.formatEther(metrics.estimatedReward),
-          isCampaignActive: true,
+          isCampaignActive: campaignStatus.isCampaignActive,
+          campaignEnded: campaignStatus.campaignEnded,
           campaignStartDate: campaignStatus.campaignStartDate,
           campaignEndDate: campaignStatus.campaignEndDate
         };
@@ -335,7 +344,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       message: endedCampaigns.length > 0 
-        ? `Transaction processed successfully. ${endedCampaigns.length} campaign(s) have ended and were not updated.`
+        ? `Transaction processed successfully. Metrics updated for ${activeCampaigns.length} active campaign(s). ${endedCampaigns.length} campaign(s) have ended but transaction was still recorded.`
         : 'Transaction processed successfully',
       data: {
         transactionHash: transaction_hash,
@@ -359,11 +368,16 @@ export async function POST(request: NextRequest) {
           totalRegisteredCampaigns: registeredCampaigns.length,
           activeCampaigns: activeCampaigns.length,
           endedCampaigns: endedCampaigns.length,
-          campaignsUpdated: activeCampaigns.length,
+          campaignsWithMetrics: campaignMetrics.length,
+          activeCampaignDetails: activeCampaigns.map(c => ({
+            campaignId: c.campaignId,
+            endDate: c.campaignEndDate,
+            status: 'Active - metrics updated'
+          })),
           endedCampaignDetails: endedCampaigns.map(c => ({
             campaignId: c.campaignId,
             endDate: c.campaignEndDate,
-            reason: 'Campaign has ended'
+            status: 'Ended - transaction recorded for historical tracking'
           }))
         },
         campaignMetrics
