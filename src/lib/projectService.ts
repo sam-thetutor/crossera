@@ -5,6 +5,10 @@ export const projectService = {
    * Create a new project in Supabase
    */
   async createProject(projectData: Partial<ProjectInsert>): Promise<Project> {
+    if (!supabaseAdmin) {
+      throw new Error('Supabase admin client not available');
+    }
+    
     const { data, error } = await supabaseAdmin
       .from('projects')
       .insert([{
@@ -184,7 +188,7 @@ export const projectService = {
    */
   async getProjectStats(): Promise<ProjectStats[]> {
     const { data, error } = await supabase
-      .from('project_stats')
+      .from('project_user_stats')
       .select('*')
       .order('created_at', { ascending: false });
     
@@ -200,6 +204,10 @@ export const projectService = {
    * Check if app_id exists
    */
   async appIdExists(appId: string): Promise<boolean> {
+    if (!supabaseAdmin) {
+      throw new Error('Supabase admin client not available');
+    }
+    
     const { data, error } = await supabaseAdmin
       .from('projects')
       .select('app_id')

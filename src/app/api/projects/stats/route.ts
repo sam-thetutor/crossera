@@ -34,10 +34,10 @@ export async function GET(request: NextRequest) {
     }
 
     const totalProjects = projectsData.length;
-    const activeProjects = projectsData.filter(p => p.is_active && p.registered_on_chain).length;
+    const activeProjects = projectsData.filter(p => p.blockchain_tx_hash).length;
 
-    // Calculate total rewards (sum for this scope only)
-    const totalRewards = projectsData.reduce((sum, p) => {
+    // Calculate total rewards from project stats
+    const totalRewards = filteredStats.reduce((sum, p) => {
       const val = typeof p.total_rewards === 'string' ? parseFloat(p.total_rewards) : Number(p.total_rewards || 0);
       return sum + (isNaN(val) ? 0 : val);
     }, 0);
