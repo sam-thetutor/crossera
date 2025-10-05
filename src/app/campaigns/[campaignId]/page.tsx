@@ -150,11 +150,9 @@ export default function CampaignDetailsPage() {
       const tx = await contract.activateCampaign(campaign!.campaign_id);
       await tx.wait();
 
-      // Update campaign status in database
-      await fetch(`/api/campaigns/${campaign!.campaign_id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ is_active: true, status: 'active' })
+      // Sync campaign status from smart contract to database
+      await fetch(`/api/campaigns/${campaign!.campaign_id}/sync`, {
+        method: 'POST'
       });
 
       setActionMessage({ type: 'success', text: 'Campaign activated successfully!' });
@@ -191,11 +189,9 @@ export default function CampaignDetailsPage() {
       const tx = await contract.deactivateCampaign(campaign!.campaign_id);
       await tx.wait();
 
-      // Update campaign status in database
-      await fetch(`/api/campaigns/${campaign!.campaign_id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ is_active: false, status: 'inactive' })
+      // Sync campaign status from smart contract to database
+      await fetch(`/api/campaigns/${campaign!.campaign_id}/sync`, {
+        method: 'POST'
       });
 
       setActionMessage({ type: 'success', text: 'Campaign deactivated successfully!' });
