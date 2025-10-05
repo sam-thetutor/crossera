@@ -3,9 +3,13 @@ import { createClient } from '@supabase/supabase-js';
 // Supabase configuration
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
-// Create Supabase client
+// Create Supabase client for frontend (with anon key)
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+// Create Supabase client for API routes (with service role key)
+export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
 // TypeScript interfaces
 export interface Project {
@@ -20,6 +24,7 @@ export interface Project {
   
   // Links
   website_url?: string;
+  github_url?: string;
   logo_url?: string;
   twitter_url?: string;
   discord_url?: string;

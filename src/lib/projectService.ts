@@ -1,11 +1,11 @@
-import { supabase, Project, ProjectInsert, ProjectUpdate, ProjectStats } from './supabase';
+import { supabase, supabaseAdmin, Project, ProjectInsert, ProjectUpdate, ProjectStats } from './supabase';
 
 export const projectService = {
   /**
    * Create a new project in Supabase
    */
   async createProject(projectData: Partial<ProjectInsert>): Promise<Project> {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('projects')
       .insert([{
         ...projectData
@@ -200,7 +200,7 @@ export const projectService = {
    * Check if app_id exists
    */
   async appIdExists(appId: string): Promise<boolean> {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('projects')
       .select('app_id')
       .eq('app_id', appId)
