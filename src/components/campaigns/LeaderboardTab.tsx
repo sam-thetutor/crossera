@@ -43,9 +43,9 @@ export function LeaderboardTab({ campaignId }: LeaderboardTabProps) {
       setLoading(true);
       setError(null);
 
-      const provider = new ethers.JsonRpcProvider('https://rpc.testnet.ms/');
+      const provider = new ethers.JsonRpcProvider('https://rpc.mainnet.ms');
       const contract = new ethers.Contract(
-        CONTRACT_ADDRESSES.testnet,
+        CONTRACT_ADDRESSES.mainnet,
         CROSS_ERA_REWARD_SYSTEM_ABI,
         provider
       );
@@ -164,28 +164,7 @@ export function LeaderboardTab({ campaignId }: LeaderboardTabProps) {
     );
   }
 
-  if (leaderboard.length === 0) {
-    return (
-      <div className="text-center py-12">
-        <div className="text-6xl mb-4">🏆</div>
-        <h3 className="text-xl font-bold text-gray-900 mb-2">No Activity Yet</h3>
-        <p className="text-gray-600 mb-4">
-          Be the first to register your app and submit transactions!
-        </p>
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-md mx-auto">
-          <p className="text-sm text-blue-800">
-            💡 <strong>How to appear on the leaderboard:</strong>
-            <br />
-            1. Register your app for this campaign
-            <br />
-            2. Send test transactions with your app ID
-            <br />
-            3. Submit transactions via the playground
-          </p>
-        </div>
-      </div>
-    );
-  }
+  
 
   return (
     <div className="space-y-6">

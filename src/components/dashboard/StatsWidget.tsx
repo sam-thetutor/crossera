@@ -9,21 +9,21 @@ interface StatItemProps {
 
 function StatItem({ label, value, icon, color = 'blue' }: StatItemProps) {
   const colorClasses = {
-    blue: 'bg-blue-50 text-blue-600',
-    green: 'bg-green-50 text-green-600',
-    purple: 'bg-purple-50 text-purple-600',
-    orange: 'bg-orange-50 text-orange-600'
+    blue: 'bg-blue-500 bg-opacity-20 text-blue-300',
+    green: 'bg-green-500 bg-opacity-20 text-green-300',
+    purple: 'bg-purple-500 bg-opacity-20 text-purple-300',
+    orange: 'bg-orange-500 bg-opacity-20 text-orange-300'
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-6">
+    <div className="glass-card rounded-lg p-6">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm text-gray-600 mb-1">{label}</p>
-          <p className="text-2xl font-bold text-gray-900">{value}</p>
+          <p className="text-sm text-gray-300 mb-1">{label}</p>
+          <p className="text-2xl font-bold text-white">{value}</p>
         </div>
         {icon && (
-          <div className={`w-12 h-12 rounded-full ${colorClasses[color]} flex items-center justify-center text-2xl`}>
+          <div className={`w-12 h-12 rounded-full ${colorClasses[color]} flex items-center justify-center text-2xl backdrop-blur-sm`}>
             {icon}
           </div>
         )}
@@ -37,13 +37,15 @@ interface StatsWidgetProps {
   activeProjects: number;
   totalRewards: string;
   totalTransactions: number;
+  totalUniqueUsers?: number;
 }
 
 export function StatsWidget({
   totalProjects,
   activeProjects,
   totalRewards,
-  totalTransactions
+  totalTransactions,
+  totalUniqueUsers = 0
 }: StatsWidgetProps) {
   const formatRewards = (rewards: string) => {
     const num = parseFloat(rewards);
@@ -56,7 +58,7 @@ export function StatsWidget({
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
       <StatItem
         label="Total Projects"
         value={totalProjects}
@@ -70,16 +72,22 @@ export function StatsWidget({
         color="green"
       />
       <StatItem
+        label="Unique Users"
+        value={totalUniqueUsers.toLocaleString()}
+        icon="👥"
+        color="purple"
+      />
+      <StatItem
         label="Total Rewards"
         value={`${formatRewards(totalRewards)} XFI`}
         icon="💰"
-        color="purple"
+        color="orange"
       />
       <StatItem
         label="Transactions"
         value={totalTransactions}
         icon="📊"
-        color="orange"
+        color="blue"
       />
     </div>
   );

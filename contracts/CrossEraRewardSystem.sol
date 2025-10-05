@@ -39,6 +39,10 @@ contract CrossEraRewardSystem is AccessControl, ReentrancyGuard, Pausable {
     mapping(uint32 => string[]) public campaignApps;          // campaign_id -> array of registered app_ids
     mapping(string => uint32[]) public appRegisteredCampaigns; // app_id -> array of campaign_ids
     
+    // NEW: Proper claim tracking
+    mapping(string => mapping(uint32 => bool)) public hasClaimed; // app_id -> campaign_id -> claimed status
+    mapping(string => mapping(uint32 => uint256)) public claimedAmounts; // app_id -> campaign_id -> claimed amount
+    
     // Cumulative metrics tracking per app per campaign
     mapping(string => mapping(uint32 => uint256)) public appCampaignFees;    // app → campaign → cumulative fees
     mapping(string => mapping(uint32 => uint256)) public appCampaignVolume;  // app → campaign → cumulative volume
@@ -333,8 +337,8 @@ contract CrossEraRewardSystem is AccessControl, ReentrancyGuard, Pausable {
         uint256 appVolume = appCampaignVolume[appId][campaignId];
         require(appFees > 0 || appVolume > 0, "CrossEra: No contributions to claim");
         
-        // Check not already claimed
-        require(claimableRewards[appId][campaignId] == 0, "CrossEra: Already claimed");
+        // Check not already claimed using proper tracking
+        require(!hasClaimed[appId][campaignId], "CrossEra: Already claimed");
         
         // Get campaign totals
         uint256 totalFees = campaignTotalFees[campaignId];
@@ -355,8 +359,9 @@ contract CrossEraRewardSystem is AccessControl, ReentrancyGuard, Pausable {
         
         require(rewardAmount > 0, "CrossEra: No rewards calculated");
         
-        // Mark as claimed to prevent double-claiming
-        claimableRewards[appId][campaignId] = rewardAmount;
+        // Mark as claimed using proper tracking
+        hasClaimed[appId][campaignId] = true;
+        claimedAmounts[appId][campaignId] = rewardAmount;
         
         // Update campaign distributed rewards
         campaign.distributedRewards += rewardAmount;
@@ -382,6 +387,133 @@ contract CrossEraRewardSystem is AccessControl, ReentrancyGuard, Pausable {
         returns (uint256) 
     {
         return claimableRewards[appId][campaignId];
+    }
+
+    /**
+     * @notice Check if a user has claimed rewards for a specific app and campaign
+     * @param appId Application identifier
+     * @param campaignId Campaign identifier
+     * @return Whether the user has claimed rewards
+     */
+    function hasUserClaimed(string memory appId, uint32 campaignId) 
+        external 
+        view 
+        returns (bool) 
+    {
+        return hasClaimed[appId][campaignId];
+    }
+
+    /**
+     * @notice Get claimed amount for a specific app and campaign
+     * @param appId Application identifier
+     * @param campaignId Campaign identifier
+     * @return Amount claimed
+     */
+    function getClaimedAmount(string memory appId, uint32 campaignId) 
+        external 
+        view 
+        returns (uint256) 
+    {
+        return claimedAmounts[appId][campaignId];
+    }
+
+    // ==================== COMPREHENSIVE USER STATUS FUNCTIONS ====================
+    
+    /**
+     * @notice Get comprehensive campaign status for a user across all campaigns
+     * @param user User address
+     * @return campaignIds Array of campaign IDs the user has apps in
+     * @return appIds Array of app IDs owned by the user
+     * @return estimatedRewards Array of estimated rewards for each app-campaign combination
+     * @return hasClaimedFlags Array of claimed status for each app-campaign combination
+     * @return userClaimedAmounts Array of claimed amounts for each app-campaign combination
+     * @return feesGenerated Array of fees generated for each app-campaign combination
+     * @return volumeGenerated Array of volume generated for each app-campaign combination
+     */
+    function getUserCampaignStatus(address user) 
+        external 
+        view 
+        returns (
+            uint32[] memory campaignIds,
+            string[] memory appIds,
+            uint256[] memory estimatedRewards,
+            bool[] memory hasClaimedFlags,
+            uint256[] memory userClaimedAmounts,
+            uint256[] memory feesGenerated,
+            uint256[] memory volumeGenerated
+        ) 
+    {
+        string[] memory userAppIds = developerApps[user];
+        
+        if (userAppIds.length == 0) {
+            // Return empty arrays if user has no apps
+            return (
+                new uint32[](0),
+                new string[](0),
+                new uint256[](0),
+                new bool[](0),
+                new uint256[](0),
+                new uint256[](0),
+                new uint256[](0)
+            );
+        }
+
+        // Count total app-campaign combinations
+        uint256 totalCombinations = 0;
+        for (uint256 i = 0; i < userAppIds.length; i++) {
+            string memory appId = userAppIds[i];
+            uint32[] memory appCampaigns = appRegisteredCampaigns[appId];
+            totalCombinations += appCampaigns.length;
+        }
+
+        // Initialize arrays
+        campaignIds = new uint32[](totalCombinations);
+        appIds = new string[](totalCombinations);
+        estimatedRewards = new uint256[](totalCombinations);
+        hasClaimedFlags = new bool[](totalCombinations);
+        userClaimedAmounts = new uint256[](totalCombinations);
+        feesGenerated = new uint256[](totalCombinations);
+        volumeGenerated = new uint256[](totalCombinations);
+
+        uint256 index = 0;
+
+        // Populate arrays with data for each app-campaign combination
+        for (uint256 i = 0; i < userAppIds.length; i++) {
+            string memory appId = userAppIds[i];
+            uint32[] memory appCampaigns = appRegisteredCampaigns[appId];
+            
+            for (uint256 j = 0; j < appCampaigns.length; j++) {
+                uint32 campaignId = appCampaigns[j];
+                CampaignCore memory campaign = campaigns[campaignId];
+                
+                // Get app metrics for this campaign
+                uint256 appFees = appCampaignFees[appId][campaignId];
+                uint256 appVolume = appCampaignVolume[appId][campaignId];
+                
+                // Calculate estimated reward (70% fees + 30% volume)
+                uint256 estimatedReward = 0;
+                uint256 totalFees = campaignTotalFees[campaignId];
+                uint256 totalVolume = campaignTotalVolume[campaignId];
+                
+                if (totalFees > 0 && appFees > 0) {
+                    estimatedReward += (campaign.totalPool * 70 / 100) * appFees / totalFees;
+                }
+                if (totalVolume > 0 && appVolume > 0) {
+                    estimatedReward += (campaign.totalPool * 30 / 100) * appVolume / totalVolume;
+                }
+                
+                // Populate arrays
+                campaignIds[index] = campaignId;
+                appIds[index] = appId;
+                estimatedRewards[index] = estimatedReward;
+                hasClaimedFlags[index] = hasClaimed[appId][campaignId];
+                userClaimedAmounts[index] = claimedAmounts[appId][campaignId];
+                feesGenerated[index] = appFees;
+                volumeGenerated[index] = appVolume;
+                
+                index++;
+            }
+        }
     }
 
     /**

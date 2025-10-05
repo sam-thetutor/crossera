@@ -1,16 +1,13 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
   --background: #ffffff;
   --foreground: #171717;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+/* Custom CSS variables */
 
 @media (prefers-color-scheme: dark) {
   :root {
@@ -20,7 +17,161 @@
 }
 
 body {
-  background: var(--background);
+  background: rgba(0, 0, 0, 0.3);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
+}
+
+html {
+  overflow-x: hidden;
+}
+
+/* Design Maestro Glass Effects */
+.glass {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+  border-radius: 16px;
+}
+
+.glass-dark {
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+  border-radius: 16px;
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.1);
+     backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 16px 60px 0 rgba(0, 0, 0, 0.3);
+  border-radius: 24px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 80px 0 rgba(0, 0, 0, 0.4);
+}
+
+.glass-navbar {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(35px);
+  -webkit-backdrop-filter: blur(35px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.2);
+}
+
+.glass-modal {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 24px 80px 0 rgba(0, 0, 0, 0.4);
+  border-radius: 28px;
+}
+
+.glass-button {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  color: white;
+}
+
+.glass-button:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Design Maestro Exact Background */
+.gradient-bg {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.gradient-bg-hero {
+  background: #000000;
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.gradient-bg-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 15% 85%, rgba(120, 119, 198, 0.15) 0%, transparent 70%),
+    radial-gradient(circle at 85% 15%, rgba(255, 119, 198, 0.15) 0%, transparent 70%),
+    radial-gradient(circle at 50% 50%, rgba(120, 219, 255, 0.1) 0%, transparent 80%);
+  animation: gradient-shift 20s ease-in-out infinite;
+  filter: blur(100px);
+  opacity: 0.6;
+  z-index: -1;
+}
+
+/* Removed redundant gradient classes - using gradient-bg-hero for consistency */
+
+/* Design Maestro Animations */
+@keyframes gradient-shift {
+  0%, 100% {
+    transform: translateX(0) translateY(0) scale(1);
+  }
+  25% {
+    transform: translateX(5%) translateY(-5%) scale(1.05);
+  }
+  50% {
+    transform: translateX(-5%) translateY(5%) scale(1.1);
+  }
+  75% {
+    transform: translateX(5%) translateY(5%) scale(1.05);
+  }
+}
+
+@keyframes glass-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(2deg);
+  }
+}
+
+.glass-float {
+  animation: float 8s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(120, 219, 255, 0.4), 0 0 30px rgba(120, 219, 255, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(120, 219, 255, 0.6), 0 0 40px rgba(120, 219, 255, 0.3);
+  }
+}
+
+.glass-pulse-glow {
+  animation: pulse-glow 4s infinite alternate;
 }

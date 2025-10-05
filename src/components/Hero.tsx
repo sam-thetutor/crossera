@@ -1,8 +1,9 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { useWallet } from '@/contexts/WalletContext';
-import { useProjectStats } from '@/hooks/useProjectStats';
+import Link from "next/link";
+import Image from "next/image";
+import { useWallet } from "@/contexts/WalletContext";
+import { useProjectStats } from "@/hooks/useProjectStats";
 
 export function Hero() {
   const { isConnected, connect } = useWallet();
@@ -10,91 +11,99 @@ export function Hero() {
 
   const totalProjects = stats?.totalProjects ?? 0;
   const activeProjects = stats?.activeProjects ?? 0;
-  const totalRewards = stats?.totalRewards ?? '0';
+  const totalRewards = stats?.totalRewards ?? "0";
 
   return (
-    <section className="relative overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-b from-white to-gray-50" />
-        <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-blue-100 blur-3xl opacity-60" />
-        <div className="absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-indigo-100 blur-3xl opacity-60" />
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+    <section className="relative overflow-hidden pt-16">
+      <div className="w-full max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-16 sm:py-24">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
           {/* Left: Copy */}
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-gray-200 bg-white text-gray-700 text-xs mb-4">
-              <span className="size-2 rounded-full bg-green-500" /> CrossFi Testnet
+            <div className="glass-card inline-flex items-center gap-2 px-4 py-2 text-white text-sm mb-6">
+              <span className="size-2 rounded-full bg-emerald-400 animate-pulse" />{" "}
+              CrossFi Mainnet
             </div>
-            <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-gray-900">
-              Launch, track, and reward your CrossFi apps
+            <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-white leading-tight">
+            Launch projects, verify, unlock funds
             </h1>
-            <p className="mt-4 text-lg text-gray-600 max-w-xl">
-              Register projects, verify on-chain activity, and earn automated rewards.
+            <p className="mt-6 text-sm text-gray-300 max-w-2xl leading-relaxed">
+              Register projects, verify on-chain activity, and unlock funds the retroactive way
+            
             </p>
 
             <div className="mt-8 flex flex-col sm:flex-row gap-3">
               {!isConnected ? (
                 <button
                   onClick={connect}
-                  className="inline-flex justify-center items-center px-6 py-3 rounded-lg bg-blue-600 text-white font-semibold shadow-sm hover:bg-blue-700 transition-colors"
+                  className="glass-card inline-flex justify-center items-center px-6 py-3 rounded-lg font-semibold"
                 >
                   Connect Wallet
                 </button>
               ) : (
                 <Link
                   href="/dashboard"
-                  className="inline-flex justify-center items-center px-6 py-3 rounded-lg bg-blue-600 text-white font-semibold shadow-sm hover:bg-blue-700 transition-colors"
+                  className="glass-card inline-flex justify-center items-center px-6 py-3 rounded-lg text-white font-semibold hover:bg-white hover:bg-opacity-20 transition-all"
                 >
-                  Go to Dashboard
+                  Dashboard
                 </Link>
               )}
               <Link
                 href="/register"
-                className="inline-flex justify-center items-center px-6 py-3 rounded-lg border border-gray-300 text-gray-800 font-semibold bg-white hover:bg-gray-50 transition-colors"
+                className="glass-card inline-flex justify-center items-center px-6 py-3 rounded-lg text-white font-semibold hover:bg-white hover:bg-opacity-20 transition-all"
               >
-                Register Project
+                New Project
               </Link>
             </div>
 
             {/* Social proof / stats */}
-            <div className="mt-8 flex flex-wrap gap-3 text-sm text-gray-600">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-gray-200">
-                <span className="text-yellow-600">★</span> Transparent
+            <div className="mt-10 flex flex-wrap gap-4 text-sm">
+              <div className="glass-card inline-flex items-center gap-2 px-4 py-2 text-white">
+                <span className="text-yellow-300">★</span> Transparent
               </div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-gray-200">
-                <span className="text-blue-600">⚙︎</span> Retroactive
+              <div className="glass-card inline-flex items-center gap-2 px-4 py-2 text-white">
+                <span className="text-blue-300">⚙︎</span> Retroactive
               </div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-gray-200">
-                <span className="text-green-600">⏱</span> Automated 
+              <div className="glass-card inline-flex items-center gap-2 px-4 py-2 text-white">
+                <span className="text-green-300">⏱</span> Automated
               </div>
             </div>
           </div>
 
           {/* Right: Visual */}
           <div className="relative">
-            <div className="relative rounded-2xl border border-gray-200 bg-white shadow-xl p-6 backdrop-blur-sm">
-              {/* Mock dashboard preview */}
-              <div className="h-56 sm:h-72 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-gray-200 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="text-5xl mb-2">📊</div>
-                  <p className="text-gray-600">Dashboard preview</p>
-                </div>
+            <div className="glass-card relative rounded-2xl p-6 glass-float overflow-hidden">
+              {/* Dashboard Preview Image */}
+              <div className="relative h-56 sm:h-72">
+                <Image
+                  src="/az.png"
+                  alt="CrossEra Dashboard Preview"
+                  width={600}
+                  height={288}
+                  className="w-full h-full object-cover rounded-xl shadow-2xl"
+                  priority
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-xl"></div>
               </div>
+
+              {/* Live Stats Overlay */}
               <div className="mt-4 grid grid-cols-3 gap-3">
-                <div className="rounded-lg border border-gray-200 bg-white p-3">
-                  <p className="text-xs text-gray-500">Total Projects</p>
-                  <p className="mt-1 text-lg font-semibold text-gray-900">{loading ? '—' : totalProjects}</p>
+                <div className="glass-button text-white rounded-lg p-3 text-center">
+                  <p className="text-xs text-gray-300">Active Campaigns</p>
+                  <p className="mt-1 text-lg font-semibold text-white">
+                    {loading ? "—" : activeProjects}
+                  </p>
                 </div>
-                <div className="rounded-lg border border-gray-200 bg-white p-3">
-                  <p className="text-xs text-gray-500">Active Apps</p>
-                  <p className="mt-1 text-lg font-semibold text-gray-900">{loading ? '—' : activeProjects}</p>
+                <div className="glass-button text-white rounded-lg p-3 text-center">
+                  <p className="text-xs text-gray-300">Total Projects</p>
+                  <p className="mt-1 text-lg font-semibold text-white">
+                    {loading ? "—" : totalProjects}
+                  </p>
                 </div>
-                <div className="rounded-lg border border-gray-200 bg-white p-3">
-                  <p className="text-xs text-gray-500">Rewards</p>
-                  <p className="mt-1 text-lg font-semibold text-gray-900">{loading ? '—' : `${Number(totalRewards).toFixed(2)} XFI`}</p>
+                <div className="glass-button text-white rounded-lg p-3 text-center">
+                  <p className="text-xs text-gray-300">Rewards</p>
+                  <p className="mt-1 text-lg font-semibold text-white">
+                    {loading ? "—" : `${Number(totalRewards).toFixed(2)} XFI`}
+                  </p>
                 </div>
               </div>
             </div>
@@ -104,5 +113,3 @@ export function Hero() {
     </section>
   );
 }
-
-

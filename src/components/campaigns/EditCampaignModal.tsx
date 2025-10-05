@@ -97,19 +97,19 @@ export function EditCampaignModal({ campaign, isOpen, onClose, onSuccess }: Edit
     <div className="fixed inset-0 z-50 overflow-y-auto">
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
+        className="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       />
 
       {/* Modal */}
       <div className="flex min-h-full items-center justify-center p-4">
-        <div className="relative bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="relative bg-gray-900 border border-gray-700 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
           {/* Header */}
-          <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-gray-900">Edit Campaign</h2>
+          <div className="sticky top-0 bg-gray-800 border-b border-gray-700 px-6 py-4 flex items-center justify-between rounded-t-2xl">
+            <h2 className="text-2xl font-bold text-white">Edit Campaign</h2>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 text-2xl leading-none"
+              className="text-gray-400 hover:text-white text-2xl leading-none transition-colors p-1 hover:bg-white hover:bg-opacity-10 rounded-lg"
             >
               ×
             </button>
@@ -117,8 +117,8 @@ export function EditCampaignModal({ campaign, isOpen, onClose, onSuccess }: Edit
 
           {/* Error Message */}
           {error && (
-            <div className="mx-6 mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-sm font-medium text-red-800">{error}</p>
+            <div className="mx-6 mt-4 p-4 bg-red-500 bg-opacity-20 border border-red-500 border-opacity-30 rounded-lg">
+              <p className="text-sm font-medium text-red-300">{error}</p>
             </div>
           )}
 
@@ -127,7 +127,7 @@ export function EditCampaignModal({ campaign, isOpen, onClose, onSuccess }: Edit
             <div className="space-y-6">
               {/* Campaign Name */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Campaign Name <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -135,46 +135,46 @@ export function EditCampaignModal({ campaign, isOpen, onClose, onSuccess }: Edit
                   value={formData.name}
                   onChange={(e) => handleChange('name', e.target.value)}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black"
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-white placeholder-gray-400"
                 />
               </div>
 
               {/* Description */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Description
                 </label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => handleChange('description', e.target.value)}
                   rows={4}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black"
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-white placeholder-gray-400 resize-none"
                 />
-                <p className="mt-1 text-sm text-gray-500">
+                <p className="mt-1 text-sm text-gray-400">
                   {formData.description.length}/2000 characters
                 </p>
               </div>
 
               {/* Category */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Category <span className="text-red-500">*</span>
                 </label>
                 <select
                   value={formData.category}
                   onChange={(e) => handleChange('category', e.target.value)}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black"
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-white"
                 >
                   {CAMPAIGN_CATEGORIES.map(cat => (
-                    <option key={cat} value={cat}>{cat}</option>
+                    <option key={cat} value={cat} className="bg-gray-800 text-white">{cat}</option>
                   ))}
                 </select>
               </div>
 
               {/* Logo URL */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Logo URL
                 </label>
                 <input
@@ -182,13 +182,13 @@ export function EditCampaignModal({ campaign, isOpen, onClose, onSuccess }: Edit
                   value={formData.logo_url}
                   onChange={(e) => handleChange('logo_url', e.target.value)}
                   placeholder="https://..."
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black"
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-white placeholder-gray-400"
                 />
               </div>
 
               {/* Banner URL */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Banner Image URL
                 </label>
                 <input
@@ -196,13 +196,13 @@ export function EditCampaignModal({ campaign, isOpen, onClose, onSuccess }: Edit
                   value={formData.banner_image_url}
                   onChange={(e) => handleChange('banner_image_url', e.target.value)}
                   placeholder="https://..."
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black"
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-white placeholder-gray-400"
                 />
               </div>
 
               {/* Eligibility Criteria */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Eligibility Criteria
                 </label>
                 <textarea
@@ -210,13 +210,13 @@ export function EditCampaignModal({ campaign, isOpen, onClose, onSuccess }: Edit
                   onChange={(e) => handleChange('eligibility_criteria', e.target.value)}
                   rows={3}
                   placeholder="Who can participate..."
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black"
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-white placeholder-gray-400 resize-none"
                 />
               </div>
 
               {/* Terms URL */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Terms & Conditions URL
                 </label>
                 <input
@@ -224,13 +224,13 @@ export function EditCampaignModal({ campaign, isOpen, onClose, onSuccess }: Edit
                   value={formData.terms_url}
                   onChange={(e) => handleChange('terms_url', e.target.value)}
                   placeholder="https://..."
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black"
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-white placeholder-gray-400"
                 />
               </div>
 
               {/* Website URL */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Website URL
                 </label>
                 <input
@@ -238,13 +238,13 @@ export function EditCampaignModal({ campaign, isOpen, onClose, onSuccess }: Edit
                   value={formData.website_url}
                   onChange={(e) => handleChange('website_url', e.target.value)}
                   placeholder="https://..."
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black"
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-white placeholder-gray-400"
                 />
               </div>
 
               {/* Twitter URL */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Twitter URL
                 </label>
                 <input
@@ -252,13 +252,13 @@ export function EditCampaignModal({ campaign, isOpen, onClose, onSuccess }: Edit
                   value={formData.twitter_url}
                   onChange={(e) => handleChange('twitter_url', e.target.value)}
                   placeholder="https://twitter.com/..."
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black"
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-white placeholder-gray-400"
                 />
               </div>
 
               {/* Discord URL */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Discord URL
                 </label>
                 <input
@@ -266,7 +266,7 @@ export function EditCampaignModal({ campaign, isOpen, onClose, onSuccess }: Edit
                   value={formData.discord_url}
                   onChange={(e) => handleChange('discord_url', e.target.value)}
                   placeholder="https://discord.gg/..."
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black"
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-white placeholder-gray-400"
                 />
               </div>
 
@@ -275,18 +275,18 @@ export function EditCampaignModal({ campaign, isOpen, onClose, onSuccess }: Edit
             </div>
 
             {/* Modal Footer */}
-            <div className="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 mt-6 -mx-6 -mb-6 flex justify-end gap-3">
+            <div className="sticky bottom-0 bg-gray-800 border-t border-gray-700 px-6 py-4 mt-6 -mx-6 -mb-6 flex justify-end gap-3 rounded-b-2xl">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
+                className="px-6 py-3 text-gray-300 font-semibold rounded-lg hover:text-white hover:bg-white hover:bg-opacity-10 transition-all"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={saving}
-                className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-3 text-white font-semibold rounded-lg hover:bg-white hover:bg-opacity-10 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {saving ? 'Saving...' : 'Save Changes'}
               </button>

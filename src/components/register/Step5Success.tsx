@@ -32,7 +32,7 @@ export function Step5Success({ formData, txHash }: Step5SuccessProps) {
           <div className="flex items-center justify-between">
             <span className="text-sm text-green-800">Transaction Hash:</span>
             <a
-              href={`https://scan.testnet.crossfi.org/tx/${txHash}`}
+              href={`https://scan.crossfi.org/tx/${txHash}`}
               target="_blank"
               rel="noopener noreferrer"
               className="text-sm text-blue-600 hover:underline font-mono"
@@ -114,7 +114,7 @@ export function Step5Success({ formData, txHash }: Step5SuccessProps) {
             📚 Documentation
           </a>
           <a
-            href="https://scan.testnet.crossfi.org"
+            href="https://scan.crossfi.org"
             target="_blank"
             rel="noopener noreferrer"
             className="text-sm text-blue-600 hover:underline"

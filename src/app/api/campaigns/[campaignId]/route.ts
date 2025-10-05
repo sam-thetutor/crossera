@@ -7,7 +7,8 @@ export async function GET(
   { params }: { params: { campaignId: string } }
 ) {
   try {
-    const campaignId = parseInt(params.campaignId);
+    const { campaignId: campaignIdParam } = await params;
+    const campaignId = parseInt(campaignIdParam);
     
     if (isNaN(campaignId)) {
       return NextResponse.json(
@@ -48,7 +49,8 @@ export async function PATCH(
   { params }: { params: { campaignId: string } }
 ) {
   try {
-    const campaignId = parseInt(params.campaignId);
+    const { campaignId: campaignIdParam } = await params;
+    const campaignId = parseInt(campaignIdParam);
     
     if (isNaN(campaignId)) {
       return NextResponse.json(
@@ -92,7 +94,8 @@ export async function DELETE(
   { params }: { params: { campaignId: string } }
 ) {
   try {
-    const campaignId = parseInt(params.campaignId);
+    const { campaignId: campaignIdParam } = await params;
+    const campaignId = parseInt(campaignIdParam);
     
     if (isNaN(campaignId)) {
       return NextResponse.json(

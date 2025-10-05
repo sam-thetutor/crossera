@@ -1,7 +1,7 @@
 const { ethers } = require("hardhat");
 
 async function main() {
-  console.log("🚀 Deploying HelloWorld to CrossFi Testnet...\n");
+  console.log("🚀 Deploying HelloWorld to CrossFi Mainnet...\n");
 
   const [deployer] = await ethers.getSigners();
   console.log("📝 Deploying with account:", deployer.address);
@@ -26,8 +26,8 @@ async function main() {
   
   console.log("\n📋 Deployment Summary:");
   console.log("=====================================");
-  console.log("Network: crossfi_testnet");
-  console.log("Chain ID: 4157");
+  console.log("Network: crossfi_mainnet");
+  console.log("Chain ID: 4158");
   console.log("HelloWorld Contract:", helloWorldAddress);
   console.log("Deployer:", deployer.address);
   console.log("=====================================");

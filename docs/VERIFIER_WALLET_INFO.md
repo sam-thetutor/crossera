@@ -14,7 +14,7 @@
 
 ### **Private Key** (Stored in .env)
 ```
-VERIFIER_PRIVATE_KEY=0xe96ea4ad33f182e9851a473662bbe2d44b45ef4d4826e7a8ed8211949ea665fc
+VERIFIER_PRIVATE_KEY=***REDACTED***
 ```
 
 ⚠️ **SECURITY WARNING:**
@@ -147,7 +147,7 @@ npx hardhat run scripts/fund-verifier.js --network crossfi_testnet
 Added to `.env`:
 ```bash
 # Verifier Wallet for Transaction Processing
-VERIFIER_PRIVATE_KEY=0xe96ea4ad33f182e9851a473662bbe2d44b45ef4d4826e7a8ed8211949ea665fc
+VERIFIER_PRIVATE_KEY=***REDACTED***
 VERIFIER_ADDRESS=0x234761e3eE6Fc918432f98B139d9584Be3919064
 ```
 

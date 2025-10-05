@@ -20,7 +20,7 @@ Visit: https://supabase.com/dashboard/project/kbayyomluildnyywnwvs
 ### Step 4: Copy the Key
 Copy the long string that looks like:
 ```
-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh...
+***REDACTED***
 ```
 
 ### Step 5: Add to .env.local
@@ -31,7 +31,7 @@ Open `.env.local` and replace the placeholder:
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key-here
 
 # To (paste your actual key):
-SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh...
+SUPABASE_SERVICE_ROLE_KEY=***REDACTED***
 ```
 
 ### Step 6: Restart Dev Server

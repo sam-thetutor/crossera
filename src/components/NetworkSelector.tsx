@@ -22,7 +22,7 @@ export function NetworkSelector() {
         <div className="grid grid-cols-1 gap-4">
           <div className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
             <div>
-              <div className="font-medium text-gray-900">CrossFi Testnet</div>
+              <div className="font-medium text-gray-900">{networkConfig.name}</div>
               <div className="text-sm text-gray-500">Chain ID: {networkConfig.chainId}</div>
               <div className="text-sm text-gray-500">RPC: {networkConfig.rpcUrl}</div>
             </div>
@@ -42,7 +42,7 @@ export function NetworkSelector() {
             <div>
               <div className="font-medium text-gray-900">CrossFi Mainnet</div>
               <div className="text-sm text-gray-500">Chain ID: 4158</div>
-              <div className="text-sm text-gray-500">RPC: https://rpc.crossfi.org</div>
+              <div className="text-sm text-gray-500">RPC: https://rpc.mainnet.ms</div>
             </div>
             <button
               onClick={() => setNetwork('mainnet')}

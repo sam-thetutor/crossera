@@ -7,20 +7,20 @@ interface CategoryBadgeProps {
 export function CategoryBadge({ category }: CategoryBadgeProps) {
   const getCategoryColor = (cat: string) => {
     const colors: Record<string, string> = {
-      DeFi: 'bg-blue-100 text-blue-800 border-blue-200',
-      NFT: 'bg-purple-100 text-purple-800 border-purple-200',
-      Gaming: 'bg-pink-100 text-pink-800 border-pink-200',
-      Metaverse: 'bg-indigo-100 text-indigo-800 border-indigo-200',
-      DAO: 'bg-green-100 text-green-800 border-green-200',
-      Infrastructure: 'bg-gray-100 text-gray-800 border-gray-200',
-      Other: 'bg-orange-100 text-orange-800 border-orange-200'
+      DeFi: 'bg-blue-500 bg-opacity-20 text-blue-300 border-blue-400 border-opacity-30',
+      NFT: 'bg-purple-500 bg-opacity-20 text-purple-300 border-purple-400 border-opacity-30',
+      Gaming: 'bg-pink-500 bg-opacity-20 text-pink-300 border-pink-400 border-opacity-30',
+      Metaverse: 'bg-indigo-500 bg-opacity-20 text-indigo-300 border-indigo-400 border-opacity-30',
+      DAO: 'bg-green-500 bg-opacity-20 text-green-300 border-green-400 border-opacity-30',
+      Infrastructure: 'bg-gray-500 bg-opacity-20 text-gray-300 border-gray-400 border-opacity-30',
+      Other: 'bg-orange-500 bg-opacity-20 text-orange-300 border-orange-400 border-opacity-30'
     };
     return colors[cat] || colors.Other;
   };
 
   return (
     <span
-      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getCategoryColor(category)}`}
+      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border backdrop-blur-sm ${getCategoryColor(category)}`}
     >
       {category}
     </span>

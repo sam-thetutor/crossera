@@ -24,39 +24,39 @@ export function PlaygroundModal({ isOpen, onClose }: PlaygroundModalProps) {
 
       {/* Modal */}
       <div className="flex min-h-full items-center justify-center p-4">
-        <div className="relative bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="relative glass-card max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
           {/* Header */}
-          <div className="sticky top-0 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-4 flex items-center justify-between rounded-t-lg">
+          <div className="sticky top-0 bg-gray-800 bg-opacity-50 backdrop-blur-sm border-b border-white border-opacity-20 text-white px-6 py-4 flex items-center justify-between rounded-t-2xl">
             <div className="flex items-center gap-3">
               <span className="text-2xl">🎮</span>
               <h2 className="text-2xl font-bold">Test Playground</h2>
             </div>
             <button
               onClick={onClose}
-              className="text-white hover:text-gray-200 text-2xl leading-none"
+              className="text-white hover:text-gray-200 text-2xl leading-none hover:bg-white hover:bg-opacity-10 rounded-lg p-1 transition-all"
             >
               ×
             </button>
           </div>
 
           {/* Tab Navigation */}
-          <div className="flex border-b border-gray-200 bg-white">
+          <div className="flex border-b border-white border-opacity-20 bg-transparent">
             <button
               onClick={() => setActiveTab('send')}
-              className={`flex-1 px-6 py-4 text-sm font-semibold transition-colors ${
+              className={`flex-1 px-6 py-4 text-sm font-semibold transition-all ${
                 activeTab === 'send'
-                  ? 'text-purple-600 border-b-2 border-purple-600 bg-purple-50'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                  ? 'text-white border-b-2 border-white bg-white bg-opacity-10'
+                  : 'text-gray-300'
               }`}
             >
               💸 Send XFI
             </button>
             <button
               onClick={() => setActiveTab('verify')}
-              className={`flex-1 px-6 py-4 text-sm font-semibold transition-colors ${
+              className={`flex-1 px-6 py-4 text-sm font-semibold transition-all ${
                 activeTab === 'verify'
-                  ? 'text-purple-600 border-b-2 border-purple-600 bg-purple-50'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                  ? 'text-white border-b-2 border-white bg-white bg-opacity-10'
+                  : 'text-gray-300'
               }`}
             >
               ✓ Verify

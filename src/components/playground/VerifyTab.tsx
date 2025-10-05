@@ -53,7 +53,7 @@ export function VerifyTab({ onSuccess }: VerifyTabProps) {
       setTxDetails(null);
 
       // Create provider to fetch transaction
-      const provider = new ethers.JsonRpcProvider('https://rpc.testnet.ms/');
+      const provider = new ethers.JsonRpcProvider('https://rpc.mainnet.ms');
       
       // Fetch transaction
       const tx = await provider.getTransaction(txHash);
@@ -169,15 +169,15 @@ export function VerifyTab({ onSuccess }: VerifyTabProps) {
     return (
       <div className="text-center py-12">
         <div className="text-6xl mb-4">🔐</div>
-        <h3 className="text-xl font-bold text-gray-900 mb-2">
+        <h3 className="text-xl font-bold text-white mb-2">
           Connect Your Wallet
         </h3>
-        <p className="text-gray-600 mb-6">
+        <p className="text-gray-300 mb-6">
           Please connect your wallet to verify transactions
         </p>
         <button
           onClick={connect}
-          className="px-6 py-3 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors"
+          className="px-6 py-3 glass-button text-white font-semibold rounded-lg hover:bg-white hover:bg-opacity-20 transition-all"
         >
           Connect Wallet
         </button>
@@ -188,21 +188,21 @@ export function VerifyTab({ onSuccess }: VerifyTabProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-bold text-gray-900 mb-2">Verify Transaction</h3>
-        <p className="text-sm text-gray-600">
+        <h3 className="text-lg font-bold text-white mb-2">Verify Transaction</h3>
+        <p className="text-sm text-gray-300">
           Enter a transaction hash to decode the app ID and view details
         </p>
       </div>
 
       {error && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-sm font-medium text-red-800 whitespace-pre-line">{error}</p>
+        <div className="p-4 bg-red-900 bg-opacity-50 backdrop-blur-sm border border-red-500 rounded-lg">
+          <p className="text-sm font-medium text-red-400 whitespace-pre-line">{error}</p>
         </div>
       )}
 
       {success && (
-        <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-          <p className="text-sm font-medium text-green-800">{success}</p>
+        <div className="p-4 bg-gray-800 bg-opacity-50 backdrop-blur-sm border border-white border-opacity-20 rounded-lg">
+          <p className="text-sm font-medium text-white">{success}</p>
         </div>
       )}
 
@@ -210,8 +210,8 @@ export function VerifyTab({ onSuccess }: VerifyTabProps) {
         <form onSubmit={handleVerify} className="space-y-6">
           {/* Transaction Hash Input */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Transaction Hash <span className="text-red-500">*</span>
+            <label className="block text-sm font-medium text-white mb-2">
+              Transaction Hash <span className="text-red-400">*</span>
             </label>
             <input
               type="text"
@@ -222,16 +222,16 @@ export function VerifyTab({ onSuccess }: VerifyTabProps) {
               }}
               placeholder="0x..."
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-black font-mono text-sm"
+              className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-white placeholder-gray-400 font-mono text-sm"
             />
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-gray-400">
               Paste the transaction hash from the "Send" tab or any CrossFi transaction
             </p>
           </div>
 
           {/* Info Box */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <p className="text-sm text-blue-800">
+          <div className="bg-gray-800 bg-opacity-50 backdrop-blur-sm border border-white border-opacity-20 rounded-lg p-4">
+            <p className="text-sm text-gray-300">
               💡 This will fetch the transaction from the blockchain and decode the app ID from the data field
             </p>
           </div>
@@ -241,7 +241,7 @@ export function VerifyTab({ onSuccess }: VerifyTabProps) {
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-3 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-3 glass-button text-white font-semibold rounded-lg hover:bg-white hover:bg-opacity-20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <span className="flex items-center gap-2">
@@ -258,34 +258,34 @@ export function VerifyTab({ onSuccess }: VerifyTabProps) {
         /* Transaction Details Display */
         <div className="space-y-6">
           {/* Success Header */}
-          <div className="text-center py-4 bg-green-50 border border-green-200 rounded-lg">
+          <div className="text-center py-4 bg-gray-800 bg-opacity-50 backdrop-blur-sm border border-white border-opacity-20 rounded-lg">
             <div className="text-4xl mb-2">✅</div>
-            <p className="text-lg font-semibold text-green-800">Transaction Verified!</p>
+            <p className="text-lg font-semibold text-white">Transaction Verified!</p>
           </div>
 
           {/* Extracted App ID */}
-          <div className="bg-purple-50 border border-purple-200 rounded-lg p-6">
-            <h4 className="text-sm font-semibold text-purple-900 mb-3">Extracted App ID</h4>
-            <div className="bg-white rounded-lg p-4">
-              <p className="text-2xl font-bold text-purple-600 text-center">
+          <div className="bg-gray-800 bg-opacity-50 backdrop-blur-sm border border-white border-opacity-20 rounded-lg p-6">
+            <h4 className="text-sm font-semibold text-white mb-3">Extracted App ID</h4>
+            <div className="bg-gray-900 bg-opacity-50 backdrop-blur-sm border border-white border-opacity-10 rounded-lg p-4">
+              <p className="text-2xl font-bold text-white text-center">
                 {txDetails.appId}
               </p>
             </div>
           </div>
 
           {/* Transaction Details */}
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <h4 className="text-sm font-semibold text-gray-900 mb-4">Transaction Details</h4>
+          <div className="bg-gray-800 bg-opacity-50 backdrop-blur-sm border border-white border-opacity-20 rounded-lg p-6">
+            <h4 className="text-sm font-semibold text-white mb-4">Transaction Details</h4>
             <dl className="space-y-3">
               <div className="flex justify-between items-start">
-                <dt className="text-sm font-medium text-gray-500">Hash</dt>
-                <dd className="text-sm font-mono text-gray-900 text-right break-all ml-4">
+                <dt className="text-sm font-medium text-gray-400">Hash</dt>
+                <dd className="text-sm font-mono text-white text-right break-all ml-4">
                   {txDetails.hash}
                   <a
-                    href={`https://scan.testnet.crossfi.org/tx/${txDetails.hash}`}
+                    href={`https://scan.crossfi.org/tx/${txDetails.hash}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-purple-600 hover:underline ml-2"
+                    className="text-purple-400 hover:text-purple-300 hover:underline ml-2 transition-colors"
                   >
                     →
                   </a>
@@ -293,45 +293,45 @@ export function VerifyTab({ onSuccess }: VerifyTabProps) {
               </div>
               
               <div className="flex justify-between">
-                <dt className="text-sm font-medium text-gray-500">From</dt>
-                <dd className="text-sm font-mono text-gray-900">
+                <dt className="text-sm font-medium text-gray-400">From</dt>
+                <dd className="text-sm font-mono text-white">
                   {txDetails.from.slice(0, 10)}...{txDetails.from.slice(-8)}
                 </dd>
               </div>
 
               <div className="flex justify-between">
-                <dt className="text-sm font-medium text-gray-500">To</dt>
-                <dd className="text-sm font-mono text-gray-900">
+                <dt className="text-sm font-medium text-gray-400">To</dt>
+                <dd className="text-sm font-mono text-white">
                   {txDetails.to.slice(0, 10)}...{txDetails.to.slice(-8)}
                 </dd>
               </div>
 
               <div className="flex justify-between">
-                <dt className="text-sm font-medium text-gray-500">Value</dt>
-                <dd className="text-sm font-semibold text-gray-900">
+                <dt className="text-sm font-medium text-gray-400">Value</dt>
+                <dd className="text-sm font-semibold text-white">
                   {txDetails.value} XFI
                 </dd>
               </div>
 
               <div className="flex justify-between">
-                <dt className="text-sm font-medium text-gray-500">Block Number</dt>
-                <dd className="text-sm text-gray-900">{txDetails.blockNumber}</dd>
+                <dt className="text-sm font-medium text-gray-400">Block Number</dt>
+                <dd className="text-sm text-white">{txDetails.blockNumber}</dd>
               </div>
 
               <div className="flex justify-between">
-                <dt className="text-sm font-medium text-gray-500">Gas Used</dt>
-                <dd className="text-sm text-gray-900">{txDetails.gasUsed}</dd>
+                <dt className="text-sm font-medium text-gray-400">Gas Used</dt>
+                <dd className="text-sm text-white">{txDetails.gasUsed}</dd>
               </div>
 
               <div className="flex justify-between">
-                <dt className="text-sm font-medium text-gray-500">Gas Price</dt>
-                <dd className="text-sm text-gray-900">{txDetails.gasPrice} Gwei</dd>
+                <dt className="text-sm font-medium text-gray-400">Gas Price</dt>
+                <dd className="text-sm text-white">{txDetails.gasPrice} Gwei</dd>
               </div>
 
               {txDetails.timestamp && (
                 <div className="flex justify-between">
-                  <dt className="text-sm font-medium text-gray-500">Timestamp</dt>
-                  <dd className="text-sm text-gray-900">
+                  <dt className="text-sm font-medium text-gray-400">Timestamp</dt>
+                  <dd className="text-sm text-white">
                     {new Date(txDetails.timestamp * 1000).toLocaleString()}
                   </dd>
                 </div>
@@ -340,9 +340,9 @@ export function VerifyTab({ onSuccess }: VerifyTabProps) {
           </div>
 
           {/* Raw Data Field */}
-          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-            <h4 className="text-sm font-semibold text-gray-900 mb-2">Raw Data Field</h4>
-            <p className="text-xs font-mono text-gray-700 break-all">
+          <div className="bg-gray-800 bg-opacity-50 backdrop-blur-sm border border-white border-opacity-20 rounded-lg p-4">
+            <h4 className="text-sm font-semibold text-white mb-2">Raw Data Field</h4>
+            <p className="text-xs font-mono text-gray-300 break-all">
               {txDetails.data || '0x (empty)'}
             </p>
           </div>
@@ -352,14 +352,14 @@ export function VerifyTab({ onSuccess }: VerifyTabProps) {
             <button
               onClick={handleReset}
               disabled={submitting}
-              className="px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-3 glass-button text-white font-semibold rounded-lg hover:bg-white hover:bg-opacity-20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Verify Another
             </button>
             <button
               onClick={handleSubmitForRewards}
               disabled={submitting || !txDetails.appId || txDetails.appId.includes('Unable to decode')}
-              className="px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-3 glass-button text-white font-semibold rounded-lg hover:bg-white hover:bg-opacity-20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {submitting ? (
                 <span className="flex items-center gap-2">

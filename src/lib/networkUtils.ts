@@ -6,7 +6,7 @@ export const CROSSFI_MAINNET_CHAIN_ID = 4158;
 /**
  * Add CrossFi network to MetaMask
  */
-export async function addCrossFiNetwork(networkType: 'testnet' | 'mainnet' = 'testnet') {
+export async function addCrossFiNetwork(networkType: 'testnet' | 'mainnet' = 'mainnet') {
   const config = NETWORK_CONFIGS[networkType];
   
   try {
@@ -30,7 +30,7 @@ export async function addCrossFiNetwork(networkType: 'testnet' | 'mainnet' = 'te
 /**
  * Switch to CrossFi network
  */
-export async function switchToCrossFiNetwork(networkType: 'testnet' | 'mainnet' = 'testnet') {
+export async function switchToCrossFiNetwork(networkType: 'testnet' | 'mainnet' = 'mainnet') {
   const config = NETWORK_CONFIGS[networkType];
   const chainId = `0x${config.chainId.toString(16)}`;
   
@@ -40,13 +40,24 @@ export async function switchToCrossFiNetwork(networkType: 'testnet' | 'mainnet' 
       method: 'wallet_switchEthereumChain',
       params: [{ chainId }],
     });
+    
+    // Wait for the switch to complete
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Verify the switch was successful
+    const currentChainId = await getCurrentChainId();
+    if (currentChainId !== config.chainId) {
+      throw new Error(`Network switch failed. Expected ${config.chainId}, got ${currentChainId}`);
+    }
+    
     return true;
   } catch (error: any) {
     // This error code indicates that the chain has not been added to MetaMask
     if (error.code === 4902) {
       // Try to add the network
       await addCrossFiNetwork(networkType);
-      return true;
+      // Try switching again after adding
+      return await switchToCrossFiNetwork(networkType);
     }
     throw error;
   }
@@ -77,6 +88,18 @@ export async function isOnCrossFiTestnet(): Promise<boolean> {
 }
 
 /**
+ * Check if user is on CrossFi Mainnet
+ */
+export async function isOnCrossFiMainnet(): Promise<boolean> {
+  try {
+    const chainId = await getCurrentChainId();
+    return chainId === CROSSFI_MAINNET_CHAIN_ID;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Ensure user is on CrossFi Testnet, switch if needed
  */
 export async function ensureCrossFiTestnet(): Promise<boolean> {
@@ -86,6 +109,21 @@ export async function ensureCrossFiTestnet(): Promise<boolean> {
     await switchToCrossFiNetwork('testnet');
     // Double check after switch
     return await isOnCrossFiTestnet();
+  }
+  
+  return true;
+}
+
+/**
+ * Ensure user is on CrossFi Mainnet, switch if needed
+ */
+export async function ensureCrossFiMainnet(): Promise<boolean> {
+  const isCorrect = await isOnCrossFiMainnet();
+  
+  if (!isCorrect) {
+    await switchToCrossFiNetwork('mainnet');
+    // Double check after switch
+    return await isOnCrossFiMainnet();
   }
   
   return true;

@@ -41,13 +41,13 @@ export function Step2Links({ formData, onChange, errors }: Step2LinksProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Links & Social Media</h2>
-        <p className="text-gray-600">Connect your project's online presence (all optional)</p>
+        <h2 className="text-2xl font-bold text-white mb-2">Links & Social Media</h2>
+        <p className="text-gray-300">Connect your project's online presence (all optional)</p>
       </div>
 
       {/* Website URL */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-white mb-2">
           Website URL
         </label>
         <div className="relative">
@@ -57,20 +57,20 @@ export function Step2Links({ formData, onChange, errors }: Step2LinksProps) {
             value={formData.website_url}
             onChange={(e) => onChange('website_url', e.target.value)}
             placeholder="https://myproject.com"
-            className={`w-full pl-12 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black ${
-              errors.website_url ? 'border-red-500' : 'border-gray-300'
+            className={`w-full pl-12 pr-4 py-3 bg-gray-800 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-white placeholder-gray-400 ${
+              errors.website_url ? 'border-red-500' : 'border-gray-600'
             }`}
           />
         </div>
         {errors.website_url && (
-          <p className="mt-1 text-sm text-red-600">{errors.website_url}</p>
+          <p className="mt-1 text-sm text-red-400">{errors.website_url}</p>
         )}
       </div>
 
       {/* Logo (Required) */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Logo <span className="text-red-500">*</span>
+        <label className="block text-sm font-medium text-white mb-2">
+          Logo <span className="text-red-400">*</span>
         </label>
         <div className="flex items-center gap-3">
           <div className="relative flex-1">
@@ -80,12 +80,12 @@ export function Step2Links({ formData, onChange, errors }: Step2LinksProps) {
               value={formData.logo_url}
               onChange={(e) => onChange('logo_url', e.target.value)}
               placeholder="https://... (or upload)"
-              className={`w-full pl-12 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black ${
-                errors.logo_url ? 'border-red-500' : 'border-gray-300'
+              className={`w-full pl-12 pr-4 py-3 bg-gray-800 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-white placeholder-gray-400 ${
+                errors.logo_url ? 'border-red-500' : 'border-gray-600'
               }`}
             />
           </div>
-          <label className="inline-flex items-center px-4 py-2 bg-gray-100 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-200 cursor-pointer">
+          <label className="inline-flex items-center px-4 py-2 glass-button text-white rounded-md text-sm font-medium hover:bg-white hover:bg-opacity-20 cursor-pointer transition-all">
             {uploading ? 'Uploading...' : 'Upload'}
             <input
               type="file"
@@ -100,13 +100,13 @@ export function Step2Links({ formData, onChange, errors }: Step2LinksProps) {
           </label>
         </div>
         {errors.logo_url && (
-          <p className="mt-1 text-sm text-red-600">{errors.logo_url}</p>
+          <p className="mt-1 text-sm text-red-400">{errors.logo_url}</p>
         )}
       </div>
 
       {/* GitHub URL */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-white mb-2">
           GitHub URL
         </label>
         <div className="relative">
@@ -116,19 +116,19 @@ export function Step2Links({ formData, onChange, errors }: Step2LinksProps) {
             value={formData.github_url}
             onChange={(e) => onChange('github_url', e.target.value)}
             placeholder="https://github.com/yourproject"
-            className={`w-full pl-12 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black ${
-              errors.github_url ? 'border-red-500' : 'border-gray-300'
+            className={`w-full pl-12 pr-4 py-3 bg-gray-800 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-white placeholder-gray-400 ${
+              errors.github_url ? 'border-red-500' : 'border-gray-600'
             }`}
           />
         </div>
         {errors.github_url && (
-          <p className="mt-1 text-sm text-red-600">{errors.github_url}</p>
+          <p className="mt-1 text-sm text-red-400">{errors.github_url}</p>
         )}
       </div>
 
       {/* Twitter URL */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-white mb-2">
           Twitter URL
         </label>
         <div className="relative">
@@ -138,19 +138,19 @@ export function Step2Links({ formData, onChange, errors }: Step2LinksProps) {
             value={formData.twitter_url}
             onChange={(e) => onChange('twitter_url', e.target.value)}
             placeholder="https://twitter.com/yourproject"
-            className={`w-full pl-12 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black ${
-              errors.twitter_url ? 'border-red-500' : 'border-gray-300'
+            className={`w-full pl-12 pr-4 py-3 bg-gray-800 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-white placeholder-gray-400 ${
+              errors.twitter_url ? 'border-red-500' : 'border-gray-600'
             }`}
           />
         </div>
         {errors.twitter_url && (
-          <p className="mt-1 text-sm text-red-600">{errors.twitter_url}</p>
+          <p className="mt-1 text-sm text-red-400">{errors.twitter_url}</p>
         )}
       </div>
 
       {/* Discord URL */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-white mb-2">
           Discord URL
         </label>
         <div className="relative">
@@ -160,13 +160,13 @@ export function Step2Links({ formData, onChange, errors }: Step2LinksProps) {
             value={formData.discord_url}
             onChange={(e) => onChange('discord_url', e.target.value)}
             placeholder="https://discord.gg/yourserver"
-            className={`w-full pl-12 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black ${
-              errors.discord_url ? 'border-red-500' : 'border-gray-300'
+            className={`w-full pl-12 pr-4 py-3 bg-gray-800 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-white placeholder-gray-400 ${
+              errors.discord_url ? 'border-red-500' : 'border-gray-600'
             }`}
           />
         </div>
         {errors.discord_url && (
-          <p className="mt-1 text-sm text-red-600">{errors.discord_url}</p>
+          <p className="mt-1 text-sm text-red-400">{errors.discord_url}</p>
         )}
       </div>
     </div>

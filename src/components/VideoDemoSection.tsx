@@ -4,13 +4,13 @@ import React from 'react';
 
 export function VideoDemoSection() {
   return (
-    <section className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="relative py-16">
+      <div className="w-full max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8">
         <div className="text-center">
-          <h2 className="text-4xl font-bold mb-6">
+          <h2 className="text-4xl font-bold text-white mb-6">
             See CrossEra in Action
           </h2>
-          <p className="text-xl mb-8 text-blue-100">
+          <p className="text-xl mb-8 text-gray-300">
             Watch how developers earn XFI rewards for building on CrossFi
           </p>
           
@@ -24,8 +24,8 @@ export function VideoDemoSection() {
                       <path d="M8 5v10l8-5-8-5z" />
                     </svg>
                   </div>
-                  <h3 className="text-2xl font-semibold mb-2">Demo Video Coming Soon</h3>
-                  <p className="text-blue-200">
+                  <h3 className="text-2xl font-semibold mb-2 text-white">Demo Video Coming Soon</h3>
+                  <p className="text-gray-300">
                     We're preparing an interactive demo showing the complete CrossEra workflow
                   </p>
                 </div>
@@ -41,8 +41,8 @@ export function VideoDemoSection() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold mb-2">App Registration</h3>
-              <p className="text-blue-200">
+              <h3 className="text-lg font-semibold text-white mb-2">App Registration</h3>
+              <p className="text-gray-300">
                 Register your application and get a unique App ID for transaction tracking
               </p>
             </div>
@@ -53,8 +53,8 @@ export function VideoDemoSection() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold mb-2">Transaction Verification</h3>
-              <p className="text-blue-200">
+              <h3 className="text-lg font-semibold text-white mb-2">Transaction Verification</h3>
+              <p className="text-gray-300">
                 Submit transaction hashes and automatically earn XFI rewards
               </p>
             </div>
@@ -65,8 +65,8 @@ export function VideoDemoSection() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold mb-2">Reward Claiming</h3>
-              <p className="text-blue-200">
+              <h3 className="text-lg font-semibold text-white mb-2">Reward Claiming</h3>
+              <p className="text-gray-300">
                 Claim your accumulated XFI rewards directly to your wallet
               </p>
             </div>

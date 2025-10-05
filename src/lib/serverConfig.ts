@@ -3,11 +3,11 @@ import { CONTRACT_ADDRESSES } from './contracts';
 
 // Server-side configuration for API routes
 export const SERVER_CONFIG = {
-  rpcUrl: process.env.RPC_URL || 'https://rpc.testnet.ms/',
-  contractAddress: process.env.CONTRACT_ADDRESS || CONTRACT_ADDRESSES.testnet,
+  rpcUrl: process.env.RPC_URL || 'https://rpc.mainnet.ms',
+  contractAddress: process.env.CONTRACT_ADDRESS || CONTRACT_ADDRESSES.mainnet,
   verifierSecret: process.env.VERIFIER_SECRET || 'default-secret-key',
   minRewardAmount: process.env.MIN_REWARD_AMOUNT || '100000000000000000', // 0.1 XFI
-  network: process.env.NETWORK || 'testnet'
+  network: process.env.NETWORK || 'mainnet'
 };
 
 // Contract ABI - Import from compiled artifacts

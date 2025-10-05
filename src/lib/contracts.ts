@@ -1,7 +1,7 @@
 // Contract addresses and configuration for CrossFi networks
 export const CONTRACT_ADDRESSES = {
   testnet: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_TESTNET || "0x6342e9382A422697D8B4DB77A1c3cc0ACE7327F7",
-  mainnet: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_MAINNET || "0x0000000000000000000000000000000000000000"
+  mainnet: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_MAINNET || "0x64Baa5262A0700061728e3A6Bbf7Eb866EdFC191"
 };
 
 // Mock XFI Token address for testing
@@ -25,7 +25,7 @@ export const NETWORK_CONFIGS = {
   mainnet: {
     chainId: 4158,
     name: 'CrossFi Mainnet',
-    rpcUrl: 'https://rpc.crossfi.org',
+    rpcUrl: 'https://rpc.mainnet.ms',
     explorerUrl: 'https://scan.crossfi.org',
     nativeCurrency: {
       name: 'XFI',
@@ -35,5 +35,5 @@ export const NETWORK_CONFIGS = {
   }
 };
 
-export const DEFAULT_NETWORK = 'testnet' as const;
+export const DEFAULT_NETWORK = 'mainnet' as const;
 export type NetworkType = keyof typeof NETWORK_CONFIGS;

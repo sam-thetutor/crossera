@@ -121,6 +121,85 @@ export async function POST(request: NextRequest) {
     const feeGenerated = gasUsed * gasPrice;
     const transactionValue = tx.value || BigInt(0);
 
+    // ==================== UNIQUE USER TRACKING (OFF-CHAIN) ====================
+    
+    // Get project ID from app_id
+    const { data: project } = await supabase
+      .from('projects')
+      .select('id')
+      .eq('app_id', appId)
+      .single();
+
+    if (!project) {
+      return NextResponse.json(
+        { success: false, error: `Project not found for app_id: ${appId}` },
+        { status: 404 }
+      );
+    }
+
+    const projectId = project.id;
+    const userAddress = tx.from.toLowerCase();
+    
+    // Check if this is a new unique user for this project
+    const { data: existingUser } = await supabase
+      .from('project_unique_users')
+      .select('id, total_transactions, total_volume, total_fees, total_rewards')
+      .eq('project_id', projectId)
+      .eq('user_address', userAddress)
+      .single();
+    
+    const isNewUniqueUser = !existingUser;
+    
+    // Calculate estimated reward (10% of gas fee, with minimum)
+    const estimatedReward = feeGenerated / BigInt(10); // 10% of gas fee
+    const minReward = BigInt(1000000000000000); // 0.001 XFI minimum
+    const finalReward = estimatedReward > minReward ? estimatedReward : minReward;
+    
+    if (isNewUniqueUser) {
+      // Insert new unique user
+      const { error: userError } = await supabase.rpc('insert_new_unique_user', {
+        p_project_id: projectId,
+        p_user_address: userAddress,
+        p_transaction_volume: transactionValue.toString(),
+        p_transaction_fees: feeGenerated.toString(),
+        p_transaction_rewards: finalReward.toString()
+      });
+      
+      if (userError) {
+        console.error('Error inserting new unique user:', userError);
+      }
+      
+      console.log('New unique user tracked:', {
+        projectId,
+        userAddress,
+        appId,
+        isNewUser: true
+      });
+    } else {
+      // Update existing user stats
+      const { error: updateError } = await supabase.rpc('update_existing_user_stats', {
+        p_project_id: projectId,
+        p_user_address: userAddress,
+        p_transaction_volume: transactionValue.toString(),
+        p_transaction_fees: feeGenerated.toString(),
+        p_transaction_rewards: finalReward.toString()
+      });
+      
+      if (updateError) {
+        console.error('Error updating existing user stats:', updateError);
+      }
+      
+      console.log('Existing user stats updated:', {
+        projectId,
+        userAddress,
+        appId,
+        isNewUser: false,
+        totalTransactions: existingUser.total_transactions + 1
+      });
+    }
+    
+    // ==================== END UNIQUE USER TRACKING ====================
+
     // Create verifier wallet with private key
     if (!process.env.VERIFIER_PRIVATE_KEY) {
       console.error('VERIFIER_PRIVATE_KEY not found in environment');
@@ -168,14 +247,16 @@ export async function POST(request: NextRequest) {
       blockNumber: processReceipt.blockNumber
     });
 
-    // Save transaction to database
+    // Save transaction to database with user tracking data
     const { data: savedTransaction, error: dbError } = await supabase
       .from('transactions')
       .insert({
-        transaction_hash,
+        tx_hash: transaction_hash,
         app_id: appId,
+        project_id: projectId,
         from_address: tx.from,
         to_address: tx.to,
+        user_address: userAddress,
         amount: transactionValue.toString(),
         gas_used: gasUsed.toString(),
         gas_price: gasPrice.toString(),
@@ -183,7 +264,9 @@ export async function POST(request: NextRequest) {
         block_number: receipt.blockNumber,
         timestamp: new Date().toISOString(),
         status: 'processed',
-        process_tx_hash: processReceipt.hash
+        process_tx_hash: processReceipt.hash,
+        is_unique_user: isNewUniqueUser,
+        reward_calculated: finalReward.toString()
       })
       .select()
       .single();
@@ -193,35 +276,96 @@ export async function POST(request: NextRequest) {
       // Don't fail the request if DB save fails - transaction is already processed on-chain
     }
 
-    // Get updated metrics for all campaigns
-    const campaignMetrics = await Promise.all(
+    // Check campaign status for all registered campaigns
+    const campaignStatuses = await Promise.all(
       registeredCampaigns.map(async (campaignId: number) => {
-        const metrics = await contract.getAppCampaignMetrics(appId, campaignId);
+        const campaign = await contract.getCampaign(campaignId);
+        const currentTime = Math.floor(Date.now() / 1000);
+        const isCampaignActive = campaign.active && 
+                                currentTime >= Number(campaign.startDate) && 
+                                currentTime <= Number(campaign.endDate);
+        
         return {
           campaignId: Number(campaignId),
-          totalFees: metrics.totalFees.toString(),
-          totalVolume: metrics.totalVolume.toString(),
-          txCount: Number(metrics.txCount),
-          estimatedReward: ethers.formatEther(metrics.estimatedReward)
+          isCampaignActive,
+          campaignEnded: !isCampaignActive && campaign.active,
+          campaignStartDate: new Date(Number(campaign.startDate) * 1000).toISOString(),
+          campaignEndDate: new Date(Number(campaign.endDate) * 1000).toISOString()
         };
       })
     );
 
+    // Filter out ended campaigns
+    const activeCampaigns = campaignStatuses.filter(c => c.isCampaignActive);
+    const endedCampaigns = campaignStatuses.filter(c => c.campaignEnded);
+
+    // Get updated metrics only for ACTIVE campaigns
+    const campaignMetrics = await Promise.all(
+      activeCampaigns.map(async (campaignStatus) => {
+        const metrics = await contract.getAppCampaignMetrics(appId, campaignStatus.campaignId);
+        
+        return {
+          campaignId: campaignStatus.campaignId,
+          totalFees: metrics.totalFees.toString(),
+          totalVolume: metrics.totalVolume.toString(),
+          txCount: Number(metrics.txCount),
+          estimatedReward: ethers.formatEther(metrics.estimatedReward),
+          isCampaignActive: true,
+          campaignStartDate: campaignStatus.campaignStartDate,
+          campaignEndDate: campaignStatus.campaignEndDate
+        };
+      })
+    );
+
+    // Log campaign status information
+    console.log('Campaign status check:', {
+      totalRegisteredCampaigns: registeredCampaigns.length,
+      activeCampaigns: activeCampaigns.length,
+      endedCampaigns: endedCampaigns.length,
+      endedCampaignIds: endedCampaigns.map(c => c.campaignId)
+    });
+
+    // Get updated unique user stats for the project
+    const { data: userStats } = await supabase
+      .from('project_user_stats')
+      .select('unique_users_count, total_users_transactions, total_users_volume, total_users_fees, total_users_rewards')
+      .eq('project_id', projectId)
+      .single();
+
     return NextResponse.json({
       success: true,
-      message: 'Transaction processed successfully',
+      message: endedCampaigns.length > 0 
+        ? `Transaction processed successfully. ${endedCampaigns.length} campaign(s) have ended and were not updated.`
+        : 'Transaction processed successfully',
       data: {
         transactionHash: transaction_hash,
         appId,
         processedAt: new Date().toISOString(),
         processTxHash: processReceipt.hash,
+        userTracking: {
+          userAddress,
+          isNewUniqueUser,
+          uniqueUsersCount: userStats?.unique_users_count || 0,
+          totalUsersTransactions: userStats?.total_users_transactions || 0
+        },
         metrics: {
           gasUsed: gasUsed.toString(),
           gasPrice: ethers.formatUnits(gasPrice, 'gwei') + ' gwei',
           feeGenerated: ethers.formatEther(feeGenerated) + ' XFI',
-          transactionValue: ethers.formatEther(transactionValue) + ' XFI'
+          transactionValue: ethers.formatEther(transactionValue) + ' XFI',
+          estimatedReward: ethers.formatEther(finalReward) + ' XFI'
         },
-        campaignsUpdated: registeredCampaigns.length,
+        campaignStatus: {
+          totalRegisteredCampaigns: registeredCampaigns.length,
+          activeCampaigns: activeCampaigns.length,
+          endedCampaigns: endedCampaigns.length,
+          campaignsUpdated: activeCampaigns.length,
+          endedCampaignDetails: endedCampaigns.map(c => ({
+            campaignId: c.campaignId,
+            endDate: c.campaignEndDate,
+            reason: 'Campaign has ended'
+          }))
+        },
         campaignMetrics
       }
     });

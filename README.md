@@ -1,198 +1,304 @@
-# 🌟 CrossEra Reward System
+# CrossEra SDK
 
-> **A complete blockchain-based reward system for CrossFi applications**
+Official SDK for CrossEra - CrossFi Reward System. This SDK provides easy access to CrossEra's reward system functionality.
 
-Developers can register apps, send transactions with tracking, verify transactions, and earn XFI rewards automatically through smart contracts.
-
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-crossera.vercel.app-blue?style=for-the-badge)](https://crossera.vercel.app/)
-[![NPM Package](https://img.shields.io/badge/NPM-crossera--verifier--sdk-red?style=for-the-badge)](https://www.npmjs.com/package/crossera-verifier-sdk)
-[![CrossFi Network](https://img.shields.io/badge/Network-CrossFi%20Testnet-purple?style=for-the-badge)](https://crossfi.org/)
-
-## 🎯 Overview
-
-The CrossEra Reward System is a comprehensive blockchain solution that incentivizes developers to build on CrossFi by providing automatic XFI rewards for verified transactions.
-
-### 🏗️ Architecture
-
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Frontend      │    │   Smart         │    │   NPM SDK       │
-│   (Next.js)     │◄──►│   Contract      │◄──►│   (TypeScript)  │
-│                 │    │   (Solidity)    │    │                 │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-         │                       │                       │
-         │              ┌─────────────────┐              │
-         └─────────────►│   Verifier API  │◄─────────────┘
-                        │   (Next.js API) │
-                        └─────────────────┘
-```
-
-## ✨ Features
-
-### 🚀 **For Developers**
-- **App Registration**: Get unique App IDs for transaction tracking
-- **Automatic Rewards**: Earn 0.1+ XFI for verified transactions
-- **Real-time Verification**: Submit transaction hashes for instant rewards
-- **Wallet Integration**: Seamless MetaMask/Web3 wallet connection
-- **Reward Claiming**: Withdraw accumulated XFI directly to wallet
-
-### 📊 **For Users**
-- **Transaction Tracking**: Monitor all reward-eligible transactions
-- **Leaderboard**: View top developers and apps by rewards earned
-- **Balance Management**: Track and claim accumulated rewards
-- **Historical Data**: View complete transaction verification history
-
-### 🛠️ **For Integrators**
-- **NPM SDK**: Easy integration with `crossera-verifier-sdk`
-- **REST API**: Direct HTTP endpoints for verification
-- **TypeScript Support**: Full type safety and autocompletion
-- **React Hooks**: Ready-to-use React components and hooks
-
-## 🏁 Quick Start
-
-### 1. **Try the Live Demo**
-
-Visit **[crossera.vercel.app](https://crossera.vercel.app/)** to:
-- Connect your CrossFi wallet (MetaMask)
-- Register an app and get an App ID
-- Send test transactions with rewards
-- Verify transactions and claim XFI
-
-### 2. **Integrate with NPM SDK**
+## Installation
 
 ```bash
-npm install crossera-verifier-sdk
+npm install crossera-sdk
 ```
 
+## Quick Start
+
 ```typescript
-import { CrossEraVerifier } from 'crossera-verifier-sdk';
+import { CrossEraSDK } from 'crossera-sdk';
 
-const verifier = new CrossEraVerifier({ network: 'testnet' });
+const sdk = new CrossEraSDK();
 
-// Generate App ID
-const appId = verifier.generateAppId();
+// Get app ID by address
+const appId = await sdk.getAppIdByAddress({
+  address: '0x46992B61b7A1d2e4F59Cd881B74A96a549EF49BF',
+  network: 'testnet'
+});
 
-// Verify transaction and earn rewards
-const result = await verifier.verifyTransaction({
-  transactionHash: 'YOUR_TX_HASH',
-  appId: 'YOUR_APP_ID'
+// Submit transaction for rewards
+const result = await sdk.submitTransaction({
+  transactionHash: '0xede6251cb0667ac7a2b51bbb9308c5b244321fe4dbb9145e1a084e6bc84053de',
+  network: 'testnet'
 });
 ```
 
-### 3. **Use Direct API**
+## API Reference
 
-```bash
-curl -X POST https://crossera.vercel.app/api/verify \
-  -H "Content-Type: application/json" \
-  -d '{
-    "transaction_hash": "YOUR_TX_HASH",
-    "app_id": "YOUR_APP_ID"
-  }'
+### CrossEraSDK
+
+#### Constructor
+
+```typescript
+new CrossEraSDK(config?: SDKConfig)
 ```
 
-## 🛠️ Development Setup
+**Parameters:**
+- `config` (optional): SDK configuration object
+  - `defaultNetwork?: Network` - Default network to use
+  - `timeout?: number` - Request timeout in milliseconds
+  - `apiKey?: string` - API key for authentication (future use)
 
-### Prerequisites
+#### Methods
 
-- **Node.js**: Version 18+ required
-- **Hardhat**: For smart contract development
-- **CrossFi Wallet**: MetaMask configured for CrossFi network
-- **Git**: For version control
+##### getAppIdByAddress
 
-### 1. Clone & Install
+Get app ID by wallet address on specified network.
+
+```typescript
+async getAppIdByAddress(params: GetAppIdParams): Promise<string | null>
+```
+
+**Parameters:**
+- `params.address` - Wallet address (0x format)
+- `params.network` - Network to query ('testnet' or 'mainnet')
+
+**Returns:** App ID string or null if not found
+
+**Example:**
+```typescript
+const appId = await sdk.getAppIdByAddress({
+  address: '0x46992B61b7A1d2e4F59Cd881B74A96a549EF49BF',
+  network: 'testnet'
+});
+```
+
+##### submitTransaction
+
+Submit transaction for rewards on specified network.
+
+```typescript
+async submitTransaction(params: SubmitTransactionParams): Promise<TransactionResult>
+```
+
+**Parameters:**
+- `params.transactionHash` - Transaction hash (0x format)
+- `params.network` - Network to submit to ('testnet' or 'mainnet')
+
+**Returns:** Transaction processing result
+
+**Example:**
+```typescript
+const result = await sdk.submitTransaction({
+  transactionHash: '0xede6251cb0667ac7a2b51bbb9308c5b244321fe4dbb9145e1a084e6bc84053de',
+  network: 'testnet'
+});
+```
+
+##### getNetworkConfig
+
+Get network configuration.
+
+```typescript
+getNetworkConfig(network: Network): NetworkConfig
+```
+
+**Parameters:**
+- `network` - Network to get config for
+
+**Returns:** Network configuration object
+
+##### getAvailableNetworks
+
+List available networks.
+
+```typescript
+getAvailableNetworks(): Network[]
+```
+
+**Returns:** Array of available networks
+
+## Types
+
+### Network
+
+```typescript
+type Network = 'testnet' | 'mainnet';
+```
+
+### GetAppIdParams
+
+```typescript
+interface GetAppIdParams {
+  address: string;
+  network: Network;
+}
+```
+
+### SubmitTransactionParams
+
+```typescript
+interface SubmitTransactionParams {
+  transactionHash: string;
+  network: Network;
+}
+```
+
+### TransactionResult
+
+```typescript
+interface TransactionResult {
+  success: boolean;
+  transactionHash: string;
+  appId: string;
+  processedAt: string;
+  network: Network;
+  metrics: {
+    gasUsed: string;
+    gasPrice: string;
+    feeGenerated: string;
+    transactionValue: string;
+  };
+  campaignsUpdated: number;
+  campaignMetrics: CampaignMetric[];
+}
+```
+
+## Usage Examples
+
+### React Hook
+
+```typescript
+import { CrossEraSDK, Network } from '@crossera/sdk';
+import { useCallback, useMemo } from 'react';
+
+function useCrossEra(network: Network) {
+  const sdk = useMemo(() => new CrossEraSDK(), []);
+  
+  const getAppId = useCallback(async (address: string) => {
+    try {
+      return await sdk.getAppIdByAddress({ address, network });
+    } catch (error) {
+      console.error(`Failed to get app ID on ${network}:`, error);
+      return null;
+    }
+  }, [sdk, network]);
+  
+  const submitTransaction = useCallback(async (hash: string) => {
+    try {
+      return await sdk.submitTransaction({ transactionHash: hash, network });
+    } catch (error) {
+      console.error(`Failed to submit transaction on ${network}:`, error);
+      throw error;
+    }
+  }, [sdk, network]);
+  
+  return { getAppId, submitTransaction };
+}
+```
+
+### Error Handling
+
+```typescript
+import { CrossEraSDK } from 'crossera-sdk';
+
+const sdk = new CrossEraSDK();
+
+async function handleAppIdLookup(address: string, network: Network) {
+  try {
+    const appId = await sdk.getAppIdByAddress({ address, network });
+    
+    if (appId) {
+      console.log(`App ID found on ${network}:`, appId);
+    } else {
+      console.log(`No app ID found for address ${address} on ${network}`);
+    }
+    
+    return appId;
+  } catch (error) {
+    console.error(`Error looking up app ID on ${network}:`, error.message);
+    throw error;
+  }
+}
+```
+
+### Batch Operations
+
+```typescript
+import { CrossEraSDK } from 'crossera-sdk';
+
+const sdk = new CrossEraSDK();
+
+async function batchGetAppIds(addresses: string[], network: Network) {
+  const results = await Promise.allSettled(
+    addresses.map(address => 
+      sdk.getAppIdByAddress({ address, network })
+    )
+  );
+  
+  return results.map((result, index) => ({
+    address: addresses[index],
+    appId: result.status === 'fulfilled' ? result.value : null,
+    error: result.status === 'rejected' ? result.reason.message : null
+  }));
+}
+```
+
+## Network Configuration
+
+### Testnet
+- **Base URL:** `https://crossera-testnet.vercel.app`
+- **Chain ID:** 1144
+- **Name:** CrossFi Testnet
+
+### Mainnet
+- **Base URL:** `https://crossera.vercel.app`
+- **Chain ID:** 1144
+- **Name:** CrossFi Mainnet
+
+## Error Handling
+
+The SDK provides comprehensive error handling:
+
+- **Validation Errors:** Invalid address, transaction hash, or network
+- **Network Errors:** Connection issues or server errors
+- **API Errors:** Specific error messages from the API
+
+All errors include context about the network and operation that failed.
+
+## Development
+
+### Setup
 
 ```bash
-git clone https://github.com/sam-thetutor/crossera.git
-cd crossera
-
-# Install dependencies
+git clone https://github.com/samthetutor/crossera-sdk.git
+cd crossera-sdk
 npm install
 ```
 
-### 2. Start Development
+### Build
+
+```bash
+npm run build
+```
+
+### Development Mode
 
 ```bash
 npm run dev
 ```
 
-Visit `http://localhost:3000`
+## Contributing
 
-## 🎯 Reward System
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-### How Rewards Work
+## License
 
-1. **Transaction Requirements**:
-   - Must be a valid CrossFi transaction
-   - Must include registered App ID in transaction data or logs
-   - Must pay transaction fees
+MIT
 
-2. **Reward Calculation**:
-   ```typescript
-   // Minimum reward: 0.1 XFI (100000000000000000 wei)
-   // Gas-based reward: max(0.1 XFI, gas_used * gas_price * 0.1)
-   const reward = Math.max(100000000000000000n, (gasUsed * gasPrice) / 10n);
-   ```
+## Support
 
-3. **Verification Process**:
-   - Fetch transaction from CrossFi RPC
-   - Validate transaction includes registered App ID
-   - Check transaction hasn't been processed before
-   - Submit reward to smart contract
-   - Update app balance for claiming
+For support and questions:
+- GitHub Issues: [https://github.com/samthetutor/crossera-sdk/issues](https://github.com/samthetutor/crossera-sdk/issues)
+- Documentation: [https://crossera.vercel.app](https://crossera.vercel.app)
 
-## 🔧 Configuration
 
-### Network Configuration
-
-**CrossFi Testnet (Default):**
-- RPC URL: `https://rpc.testnet.crossfi.org`
-- Chain ID: `4157`
-- Currency Symbol: `XFI`
-- Block Explorer: `https://scan.testnet.crossfi.org`
-
-**CrossFi Mainnet:**
-- RPC URL: `https://rpc.crossfi.org`
-- Chain ID: `4158`
-- Currency Symbol: `XFI`
-- Block Explorer: `https://scan.crossfi.org`
-
-## 🎯 Roadmap
-
-### Phase 1: Core System 🚧
-- [ ] Smart contract development (Solidity)
-- [ ] Frontend application adaptation
-- [ ] Verifier API for CrossFi
-- [ ] NPM SDK package
-
-### Phase 2: Enhanced Features 📋
-- [ ] Leaderboard system
-- [ ] App name management
-- [ ] Dynamic data fetching
-- [ ] Testnet deployment
-
-### Phase 3: Advanced Features 📋
-- [ ] Mainnet deployment
-- [ ] Advanced reward algorithms
-- [ ] Multi-token support (ERC-20)
-- [ ] Developer analytics dashboard
-
-## 📄 License
-
-MIT License - see [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- **CrossFi Foundation**: For the innovative EVM-compatible blockchain platform
-- **Ethereum Community**: For the robust smart contract standards
-- **Community**: For feedback and contributions
-- **Developers**: For building the CrossFi ecosystem
-
----
-
-<div align="center">
-
-**Built with ❤️ for the CrossFi ecosystem**
-
-[🌟 Star on GitHub](https://github.com/sam-thetutor/crossera) • [🚀 Try Live Demo](https://crossera.vercel.app/) • [📦 Use NPM SDK](https://www.npmjs.com/package/crossera-verifier-sdk)
-
-</div>

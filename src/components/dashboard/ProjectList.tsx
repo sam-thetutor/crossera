@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Project } from '@/lib/supabase';
 import { ProjectCard } from './ProjectCard';
-import { LoadingSpinner } from '@/components/shared/LoadingSpinner';
+import { SkeletonLoader } from '@/components/shared/SkeletonLoader';
 import { EmptyState } from '@/components/shared/EmptyState';
 
 interface ProjectListProps {
@@ -27,7 +27,7 @@ export function ProjectList({ projects, loading }: ProjectListProps) {
   });
 
   if (loading) {
-    return <LoadingSpinner message="Loading projects..." />;
+    return <SkeletonLoader type="projects" />;
   }
 
   return (
@@ -39,10 +39,10 @@ export function ProjectList({ projects, loading }: ProjectListProps) {
           <select
             value={filterCategory}
             onChange={(e) => setFilterCategory(e.target.value)}
-            className="px-4 py-2 border text-black border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="glass-button px-4 py-2 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 bg-black bg-opacity-20 border border-white border-opacity-20"
           >
             {categories.map(cat => (
-              <option key={cat} value={cat}>
+              <option key={cat} value={cat} className="bg-gray-800 text-white">
                 {cat === 'all' ? 'All Categories' : cat}
               </option>
             ))}
@@ -52,12 +52,12 @@ export function ProjectList({ projects, loading }: ProjectListProps) {
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-4 py-2 border border-gray-300 text-black rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="glass-button px-4 py-2 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 bg-black bg-opacity-20 border border-white border-opacity-20"
           >
-            <option value="all">All Status</option>
-            <option value="pending">Pending</option>
-            <option value="confirmed">Confirmed</option>
-            <option value="failed">Failed</option>
+            <option value="all" className="bg-gray-800 text-white">All Status</option>
+            <option value="pending" className="bg-gray-800 text-white">Pending</option>
+            <option value="confirmed" className="bg-gray-800 text-white">Confirmed</option>
+            <option value="failed" className="bg-gray-800 text-white">Failed</option>
           </select>
 
           {/* Results Count */}
@@ -67,13 +67,13 @@ export function ProjectList({ projects, loading }: ProjectListProps) {
         </div>
 
         {/* View Mode Toggle */}
-        <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
+        <div className="flex items-center gap-2 glass-card rounded-lg p-1">
           <button
             onClick={() => setViewMode('grid')}
             className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
               viewMode === 'grid'
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
+                ? 'bg-white bg-opacity-20 text-white shadow-sm'
+                : 'text-gray-300 hover:text-white'
             }`}
           >
             Grid
@@ -82,8 +82,8 @@ export function ProjectList({ projects, loading }: ProjectListProps) {
             onClick={() => setViewMode('list')}
             className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
               viewMode === 'list'
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
+                ? 'bg-white bg-opacity-20 text-white shadow-sm'
+                : 'text-gray-300 hover:text-white'
             }`}
           >
             List

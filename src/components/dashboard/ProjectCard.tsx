@@ -4,106 +4,71 @@ import Link from 'next/link';
 import { Project } from '@/lib/supabase';
 import { BlockchainStatusBadge } from '@/components/shared/BlockchainStatusBadge';
 import { CategoryBadge } from '@/components/shared/CategoryBadge';
+import { UniqueUsersWidgetCompact } from '@/components/shared/UniqueUsersWidget';
 
 interface ProjectCardProps {
   project: Project;
 }
 
 export function ProjectCard({ project }: ProjectCardProps) {
-  const formatAddress = (address: string) => {
-    return `${address.slice(0, 6)}...${address.slice(-4)}`;
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    });
-  };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
+    <Link 
+      href={`/projects/${project.app_id}`}
+      className="glass-card rounded-lg p-4 hover:bg-opacity-30 transition-all cursor-pointer block"
+    >
       {/* Header */}
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex-1">
-          <Link 
-            href={`/projects/${project.app_id}`}
-            className="text-lg font-semibold text-gray-900 hover:text-blue-600 transition-colors"
-          >
-            {project.app_name}
-          </Link>
-          <p className="text-sm text-gray-500 mt-1">
-            ID: {project.app_id}
-          </p>
-        </div>
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-lg font-semibold text-white truncate flex-1 mr-2">
+          {project.app_name}
+        </h3>
         {project.logo_url && (
           <img 
             src={project.logo_url} 
             alt={project.app_name}
-            className="w-12 h-12 rounded-lg object-cover"
+            className="w-10 h-10 rounded-lg object-cover flex-shrink-0"
           />
         )}
       </div>
 
-      {/* Description */}
-      {project.description && (
-        <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-          {project.description}
-        </p>
-      )}
-
       {/* Badges */}
-      <div className="flex items-center gap-2 mb-4">
+      <div className="flex items-center gap-2 mb-3">
         {project.category && <CategoryBadge category={project.category} />}
         <BlockchainStatusBadge status={project.blockchain_status} />
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4 py-4 border-t border-gray-100">
+      <div className="grid grid-cols-2 gap-3 mb-3">
         <div>
-          <p className="text-xs text-gray-500">Transactions</p>
-          <p className="text-lg font-semibold text-gray-900">
+          <p className="text-xs text-gray-400">Transactions</p>
+          <p className="text-sm font-semibold text-white">
             {project.total_transactions}
           </p>
         </div>
         <div>
-          <p className="text-xs text-gray-500">Rewards</p>
-          <p className="text-lg font-semibold text-gray-900">
+          <p className="text-xs text-gray-400">Rewards</p>
+          <p className="text-sm font-semibold text-white">
             {parseFloat(project.total_rewards || '0').toFixed(2)}
-          </p>
-        </div>
-        <div>
-          <p className="text-xs text-gray-500">Status</p>
-          <p className="text-lg font-semibold text-gray-900">
-            {project.is_active ? '✓' : '✗'}
           </p>
         </div>
       </div>
 
-      {/* Footer */}
-      <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-        <div className="text-xs text-gray-500">
-          Created {formatDate(project.created_at)}
-        </div>
-        <Link
-          href={`/projects/${project.app_id}`}
-          className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-        >
-          View Details →
-        </Link>
+      {/* Unique Users */}
+      <div className="mb-3">
+        <UniqueUsersWidgetCompact appId={project.app_id} />
       </div>
 
       {/* Links */}
       {(project.website_url || project.github_url || project.twitter_url) && (
-        <div className="flex items-center gap-3 mt-4 pt-4 border-t border-gray-100">
+        <div className="flex items-center gap-2 pt-2 border-t border-white border-opacity-10">
           {project.website_url && (
             <a
               href={project.website_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-gray-400 hover:text-white transition-colors text-sm"
               title="Website"
+              onClick={(e) => e.stopPropagation()}
             >
               🌐
             </a>
@@ -113,8 +78,9 @@ export function ProjectCard({ project }: ProjectCardProps) {
               href={project.github_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-gray-400 hover:text-white transition-colors text-sm"
               title="GitHub"
+              onClick={(e) => e.stopPropagation()}
             >
               💻
             </a>
@@ -124,15 +90,16 @@ export function ProjectCard({ project }: ProjectCardProps) {
               href={project.twitter_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-gray-400 hover:text-white transition-colors text-sm"
               title="Twitter"
+              onClick={(e) => e.stopPropagation()}
             >
               🐦
             </a>
           )}
         </div>
       )}
-    </div>
+    </Link>
   );
 }
 

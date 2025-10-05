@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ethers } from 'ethers';
-import { campaignService } from '@/lib/campaignService';
+import { createClient } from '@supabase/supabase-js';
+
+// Create Supabase client with service role key for API routes
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 // GET /api/campaigns - Get campaigns with filters
 export async function GET(request: NextRequest) {
@@ -22,24 +28,77 @@ export async function GET(request: NextRequest) {
           { status: 400 }
         );
       }
-      campaigns = await campaignService.getCampaignsByCreator(creator);
+      
+      const { data, error } = await supabase
+        .from('campaigns')
+        .select('*')
+        .eq('created_by', creator.toLowerCase())
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      campaigns = data || [];
     } else if (search) {
-      campaigns = await campaignService.searchCampaigns(search);
+      const { data, error } = await supabase
+        .from('campaigns')
+        .select('*')
+        .or(`name.ilike.%${search}%,description.ilike.%${search}%`)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      campaigns = data || [];
     } else if (featured === 'true') {
-      campaigns = await campaignService.getFeaturedCampaigns();
+      const { data, error } = await supabase
+        .from('campaigns')
+        .select('*')
+        .eq('is_featured', true)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      campaigns = data || [];
     } else if (active === 'true') {
-      campaigns = await campaignService.getActiveCampaigns();
+      const { data, error } = await supabase
+        .from('campaigns')
+        .select('*')
+        .eq('is_active', true)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      campaigns = data || [];
     } else if (status) {
-      campaigns = await campaignService.getCampaignsByStatus(status);
+      const { data, error } = await supabase
+        .from('campaigns')
+        .select('*')
+        .eq('status', status)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      campaigns = data || [];
     } else {
-      campaigns = await campaignService.getAllCampaigns();
+      const { data, error } = await supabase
+        .from('campaigns')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      campaigns = data || [];
     }
 
     // Get stats if requested
     const includeStats = searchParams.get('include_stats') === 'true';
     let stats = null;
     if (includeStats) {
-      stats = await campaignService.getCampaignStats();
+      const { data: statsData, error: statsError } = await supabase
+        .from('campaigns')
+        .select('total_pool, distributed_rewards, status, is_active');
+      
+      if (statsError) throw statsError;
+      
+      stats = {
+        totalCampaigns: campaigns.length,
+        totalPool: statsData?.reduce((sum, c) => sum + parseFloat(c.total_pool || '0'), 0) || 0,
+        totalDistributed: statsData?.reduce((sum, c) => sum + parseFloat(c.distributed_rewards || '0'), 0) || 0,
+        activeCampaigns: statsData?.filter(c => c.is_active).length || 0
+      };
     }
 
     return NextResponse.json({
@@ -122,8 +181,17 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if campaign_id already exists
-    const exists = await campaignService.campaignIdExists(campaign_id);
-    if (exists) {
+    const { data: existingCampaign, error: existsError } = await supabase
+      .from('campaigns')
+      .select('id')
+      .eq('campaign_id', campaign_id)
+      .single();
+    
+    if (existsError && existsError.code !== 'PGRST116') {
+      throw existsError;
+    }
+    
+    if (existingCampaign) {
       return NextResponse.json(
         { success: false, error: 'Campaign ID already exists' },
         { status: 409 }
@@ -140,31 +208,37 @@ export async function POST(request: NextRequest) {
     }
 
     // Create campaign in Supabase
-    const campaign = await campaignService.createCampaign({
-      campaign_id,
-      name,
-      description: description || '',
-      banner_image_url: banner_image_url || '',
-      logo_url: logo_url || '',
-      category: category || 'General',
-      total_pool,
-      distributed_rewards: '0',
-      start_date: startDate.toISOString(),
-      end_date: endDate.toISOString(),
-      is_active: false, // Admin activates after creation
-      eligibility_criteria: eligibility_criteria || '',
-      terms_url: terms_url || '',
-      website_url: website_url || '',
-      twitter_url: twitter_url || '',
-      discord_url: discord_url || '',
-      registered_apps_count: 0,
-      total_transactions: 0,
-      status,
-      is_featured: is_featured || false,
-      tags: tags || [],
-      created_by: created_by.toLowerCase(),
-      blockchain_tx_hash: blockchain_tx_hash || ''
-    });
+    const { data: campaign, error: createError } = await supabase
+      .from('campaigns')
+      .insert({
+        campaign_id,
+        name,
+        description: description || '',
+        banner_image_url: banner_image_url || '',
+        logo_url: logo_url || '',
+        category: category || 'General',
+        total_pool,
+        distributed_rewards: '0',
+        start_date: startDate.toISOString(),
+        end_date: endDate.toISOString(),
+        is_active: false, // Admin activates after creation
+        eligibility_criteria: eligibility_criteria || '',
+        terms_url: terms_url || '',
+        website_url: website_url || '',
+        twitter_url: twitter_url || '',
+        discord_url: discord_url || '',
+        registered_apps_count: 0,
+        total_transactions: 0,
+        status,
+        is_featured: is_featured || false,
+        tags: tags || [],
+        created_by: created_by.toLowerCase(),
+        blockchain_tx_hash: blockchain_tx_hash || ''
+      })
+      .select()
+      .single();
+
+    if (createError) throw createError;
 
     return NextResponse.json({
       success: true,

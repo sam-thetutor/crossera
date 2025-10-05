@@ -47,8 +47,8 @@ export function TransactionHistory({ projectId }: TransactionHistoryProps) {
 
   if (loading) {
     return (
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">Transaction History</h2>
+      <div className="glass-card rounded-lg p-6">
+        <h2 className="text-xl font-bold text-white mb-6">Transaction History</h2>
         <LoadingSpinner size="sm" message="Loading transactions..." />
       </div>
     );
@@ -56,20 +56,20 @@ export function TransactionHistory({ projectId }: TransactionHistoryProps) {
 
   if (error) {
     return (
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">Transaction History</h2>
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-red-800 text-sm">{error}</p>
+      <div className="glass-card rounded-lg p-6">
+        <h2 className="text-xl font-bold text-white mb-6">Transaction History</h2>
+        <div className="glass-card rounded-lg p-4 border-red-500 border-opacity-30">
+          <p className="text-red-300 text-sm">{error}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-6">
-      <h2 className="text-xl font-bold text-gray-900 mb-6">
+    <div className="glass-card rounded-lg p-6">
+      <h2 className="text-xl font-bold text-white mb-6">
         Transaction History
-        <span className="ml-2 text-sm font-normal text-gray-500">
+        <span className="ml-2 text-sm font-normal text-gray-400">
           ({transactions.length} {transactions.length === 1 ? 'transaction' : 'transactions'})
         </span>
       </h2>
@@ -82,41 +82,41 @@ export function TransactionHistory({ projectId }: TransactionHistoryProps) {
         />
       ) : (
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-white divide-opacity-10">
+            <thead className="bg-black bg-opacity-20 backdrop-blur-sm">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                   Transaction Hash
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                   Type
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                   Reward
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                   Date
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                   Action
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="divide-y divide-white divide-opacity-10">
               {transactions.map((tx) => (
-                <tr key={tx.id} className="hover:bg-gray-50">
+                <tr key={tx.id} className="hover:bg-white hover:bg-opacity-5 transition-colors">
                   <td className="px-4 py-4 whitespace-nowrap">
-                    <span className="text-sm font-mono text-gray-900">
+                    <span className="text-sm font-mono text-white">
                       {tx.tx_hash.slice(0, 10)}...{tx.tx_hash.slice(-8)}
                     </span>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
-                    <span className="text-sm text-gray-600">
+                    <span className="text-sm text-gray-300">
                       {tx.transaction_type || 'Other'}
                     </span>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
-                    <span className="text-sm font-medium text-green-600">
+                    <span className="text-sm font-medium text-green-400">
                       {tx.reward_calculated ? 
                         `${(parseFloat(tx.reward_calculated) / 1e18).toFixed(4)} XFI` : 
                         '-'
@@ -124,16 +124,16 @@ export function TransactionHistory({ projectId }: TransactionHistoryProps) {
                     </span>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
-                    <span className="text-sm text-gray-600">
+                    <span className="text-sm text-gray-400">
                       {formatDate(tx.processed_at)}
                     </span>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
                     <a
-                      href={`https://scan.testnet.crossfi.org/tx/${tx.tx_hash}`}
+                      href={`https://scan.crossfi.org/tx/${tx.tx_hash}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-sm text-blue-600 hover:underline"
+                      className="text-sm text-purple-400 hover:text-purple-300 hover:underline transition-colors"
                     >
                       View →
                     </a>

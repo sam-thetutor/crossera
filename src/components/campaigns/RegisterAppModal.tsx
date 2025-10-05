@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 import { CONTRACT_ADDRESSES } from '@/lib/contracts';
 import { CROSS_ERA_REWARD_SYSTEM_ABI } from '@/lib/serverConfig';
-import { ensureCrossFiTestnet } from '@/lib/networkUtils';
+import { ensureCrossFiMainnet } from '@/lib/networkUtils';
 
 interface Project {
   id: string;
@@ -86,12 +86,12 @@ export function RegisterAppModal({
         throw new Error('MetaMask not found');
       }
 
-      await ensureCrossFiTestnet();
+      await ensureCrossFiMainnet();
 
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
       const contract = new ethers.Contract(
-        CONTRACT_ADDRESSES.testnet,
+        CONTRACT_ADDRESSES.mainnet,
         CROSS_ERA_REWARD_SYSTEM_ABI,
         signer
       );
@@ -156,14 +156,14 @@ export function RegisterAppModal({
 
       {/* Modal */}
       <div className="flex min-h-full items-center justify-center p-4">
-        <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full">
+        <div className="relative glass-card rounded-lg shadow-xl max-w-md w-full">
           {/* Header */}
-          <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-lg">
-            <h2 className="text-xl font-bold text-gray-900">Register App for Campaign</h2>
+          <div className="glass-card border-b border-white border-opacity-10 px-6 py-4 flex items-center justify-between rounded-t-lg">
+            <h2 className="text-xl font-bold text-white">Register App for Campaign</h2>
             <button
               onClick={handleClose}
               disabled={registering}
-              className="text-gray-400 hover:text-gray-600 text-2xl leading-none disabled:opacity-50"
+              className="text-gray-400 hover:text-white text-2xl leading-none disabled:opacity-50"
             >
               ×
             </button>
@@ -174,31 +174,31 @@ export function RegisterAppModal({
             {status === 'idle' ? (
               <form onSubmit={handleRegister} className="space-y-6">
                 <div>
-                  <p className="text-sm text-gray-600 mb-4">
-                    Register one of your apps for <strong>{campaignName}</strong>
+                  <p className="text-sm text-gray-300 mb-4">
+                    Register one of your apps for <strong className="text-white">{campaignName}</strong>
                   </p>
 
                   {error && (
-                    <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                      <p className="text-sm text-red-800">{error}</p>
+                    <div className="mb-4 p-3 glass-card bg-red-500 bg-opacity-20 border border-red-500 border-opacity-30 rounded-lg">
+                      <p className="text-sm text-red-300">{error}</p>
                     </div>
                   )}
 
                   {loading ? (
                     <div className="text-center py-8">
                       <div className="animate-spin text-4xl mb-2">⏳</div>
-                      <p className="text-sm text-gray-600">Loading your apps...</p>
+                      <p className="text-sm text-gray-300">Loading your apps...</p>
                     </div>
                   ) : projects.length === 0 ? (
                     <div className="text-center py-8">
                       <div className="text-4xl mb-2">📦</div>
-                      <p className="text-sm font-medium text-gray-900 mb-2">No registered apps found</p>
-                      <p className="text-sm text-gray-600 mb-4">
+                      <p className="text-sm font-medium text-white mb-2">No registered apps found</p>
+                      <p className="text-sm text-gray-300 mb-4">
                         You need to register an app first before joining campaigns
                       </p>
                       <a
                         href="/register"
-                        className="inline-block px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700"
+                        className="inline-block px-4 py-2 glass-button text-white text-sm font-semibold rounded-lg hover:bg-white hover:bg-opacity-20 transition-all"
                       >
                         Register an App
                       </a>
@@ -206,22 +206,22 @@ export function RegisterAppModal({
                   ) : (
                     <>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Select App <span className="text-red-500">*</span>
+                        <label className="block text-sm font-medium text-white mb-2">
+                          Select App <span className="text-red-400">*</span>
                         </label>
                         <select
                           value={selectedAppId}
                           onChange={(e) => setSelectedAppId(e.target.value)}
                           required
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black"
+                          className="w-full px-4 py-3 glass-button border border-white border-opacity-20 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-white bg-black bg-opacity-20"
                         >
                           {projects.map((project) => (
-                            <option key={project.app_id} value={project.app_id}>
+                            <option key={project.app_id} value={project.app_id} className="bg-gray-800 text-white">
                               {project.app_name} ({project.category})
                             </option>
                           ))}
                         </select>
-                        <p className="mt-1 text-xs text-gray-500">
+                        <p className="mt-1 text-xs text-gray-400">
                           {projects.length} app{projects.length !== 1 ? 's' : ''} available
                         </p>
                       </div>
@@ -233,14 +233,14 @@ export function RegisterAppModal({
                           type="button"
                           onClick={handleClose}
                           disabled={registering}
-                          className="px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+                          className="px-6 py-3 glass-button border border-white border-opacity-20 text-white font-semibold rounded-lg hover:bg-white hover:bg-opacity-20 transition-colors disabled:opacity-50"
                         >
                           Cancel
                         </button>
                         <button
                           type="submit"
                           disabled={registering}
-                          className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="px-6 py-3 glass-button bg-purple-600 bg-opacity-80 text-white font-semibold rounded-lg hover:bg-purple-700 hover:bg-opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           Register App
                         </button>
@@ -255,20 +255,20 @@ export function RegisterAppModal({
                 {status === 'signing' && (
                   <>
                     <div className="text-6xl mb-4 animate-pulse">✍️</div>
-                    <p className="text-lg font-medium text-gray-900">Waiting for signature...</p>
-                    <p className="text-sm text-gray-600 mt-2">Please confirm in MetaMask</p>
+                    <p className="text-lg font-medium text-white">Waiting for signature...</p>
+                    <p className="text-sm text-gray-300 mt-2">Please confirm in MetaMask</p>
                   </>
                 )}
                 {status === 'confirming' && (
                   <>
                     <div className="text-6xl mb-4 animate-spin">⏳</div>
-                    <p className="text-lg font-medium text-gray-900">Transaction confirming...</p>
+                    <p className="text-lg font-medium text-white">Transaction confirming...</p>
                     {txHash && (
                       <a
-                        href={`https://scan.testnet.crossfi.org/tx/${txHash}`}
+                        href={`https://scan.crossfi.org/tx/${txHash}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm text-blue-600 hover:underline mt-2 inline-block"
+                        className="text-sm text-blue-400 hover:text-blue-300 hover:underline mt-2 inline-block"
                       >
                         View transaction
                       </a>
@@ -278,7 +278,7 @@ export function RegisterAppModal({
                 {status === 'saving' && (
                   <>
                     <div className="text-6xl mb-4 animate-pulse">💾</div>
-                    <p className="text-lg font-medium text-gray-900">Saving to database...</p>
+                    <p className="text-lg font-medium text-white">Saving to database...</p>
                   </>
                 )}
               </div>

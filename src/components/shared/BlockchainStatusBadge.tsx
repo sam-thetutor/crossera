@@ -10,30 +10,30 @@ export function BlockchainStatusBadge({ status, showIcon = true }: BlockchainSta
     switch (status) {
       case 'confirmed':
         return {
-          bg: 'bg-green-100',
-          text: 'text-green-800',
-          border: 'border-green-200',
+          bg: 'bg-green-500 bg-opacity-20',
+          text: 'text-green-300',
+          border: 'border-green-400 border-opacity-30',
           icon: '✓'
         };
       case 'pending':
         return {
-          bg: 'bg-yellow-100',
-          text: 'text-yellow-800',
-          border: 'border-yellow-200',
+          bg: 'bg-yellow-500 bg-opacity-20',
+          text: 'text-yellow-300',
+          border: 'border-yellow-400 border-opacity-30',
           icon: '⏳'
         };
       case 'failed':
         return {
-          bg: 'bg-red-100',
-          text: 'text-red-800',
-          border: 'border-red-200',
+          bg: 'bg-red-500 bg-opacity-20',
+          text: 'text-red-300',
+          border: 'border-red-400 border-opacity-30',
           icon: '✗'
         };
       default:
         return {
-          bg: 'bg-gray-100',
-          text: 'text-gray-800',
-          border: 'border-gray-200',
+          bg: 'bg-gray-500 bg-opacity-20',
+          text: 'text-gray-300',
+          border: 'border-gray-400 border-opacity-30',
           icon: '?'
         };
     }
@@ -43,7 +43,7 @@ export function BlockchainStatusBadge({ status, showIcon = true }: BlockchainSta
 
   return (
     <span
-      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${styles.bg} ${styles.text} ${styles.border}`}
+      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border backdrop-blur-sm ${styles.bg} ${styles.text} ${styles.border}`}
     >
       {showIcon && <span className="mr-1">{styles.icon}</span>}
       {status.charAt(0).toUpperCase() + status.slice(1)}

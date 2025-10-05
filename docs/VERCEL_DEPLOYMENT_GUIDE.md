@@ -29,10 +29,10 @@ Copy and paste these environment variables into your Vercel project settings:
 
 ```bash
 # Supabase Service Role Key (Backend Only - Keep Secret!)
-SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtiYXl5b21sdWlsZG55eXdud3ZzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1OTMyMTg3OCwiZXhwIjoyMDc0ODk3ODc4fQ.aCj52DNWUPJ83nRoeDiiUzbB68nvzoQP5Qw7JbQck0s
+SUPABASE_SERVICE_ROLE_KEY=***REDACTED***
 
 # Verifier Wallet Private Key (Backend Only - Keep Secret!)
-VERIFIER_PRIVATE_KEY=0xe96ea4ad33f182e9851a473662bbe2d44b45ef4d4826e7a8ed8211949ea665fc
+VERIFIER_PRIVATE_KEY=***REDACTED***
 ```
 
 ---
@@ -42,7 +42,7 @@ VERIFIER_PRIVATE_KEY=0xe96ea4ad33f182e9851a473662bbe2d44b45ef4d4826e7a8ed8211949
 ```bash
 # Supabase Configuration
 NEXT_PUBLIC_SUPABASE_URL=https://kbayyomluildnyywnwvs.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtiYXl5b21sdWlsZG55eXdud3ZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzMjE4NzgsImV4cCI6MjA3NDg5Nzg3OH0.UzmowWAwOWhAsrnQWcgESqLURwMqtWFx_8FW5znngD0
+NEXT_PUBLIC_SUPABASE_ANON_KEY=***REDACTED***
 
 # Smart Contract Addresses
 NEXT_PUBLIC_CONTRACT_ADDRESS_TESTNET=0x6342e9382A422697D8B4DB77A1c3cc0ACE7327F7
@@ -82,11 +82,11 @@ MIN_REWARD_AMOUNT=100000000000000000
 Here's the format for adding them in Vercel UI:
 
 **Name:** `SUPABASE_SERVICE_ROLE_KEY`  
-**Value:** `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtiYXl5b21sdWlsZG55eXdud3ZzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1OTMyMTg3OCwiZXhwIjoyMDc0ODk3ODc4fQ.aCj52DNWUPJ83nRoeDiiUzbB68nvzoQP5Qw7JbQck0s`  
+**Value:** `***REDACTED***`  
 **Environment:** All (Production, Preview, Development)
 
 **Name:** `VERIFIER_PRIVATE_KEY`  
-**Value:** `0xe96ea4ad33f182e9851a473662bbe2d44b45ef4d4826e7a8ed8211949ea665fc`  
+**Value:** `***REDACTED***`  
 **Environment:** All (Production, Preview, Development)
 
 **Name:** `NEXT_PUBLIC_SUPABASE_URL`  
@@ -94,7 +94,7 @@ Here's the format for adding them in Vercel UI:
 **Environment:** All (Production, Preview, Development)
 
 **Name:** `NEXT_PUBLIC_SUPABASE_ANON_KEY`  
-**Value:** `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtiYXl5b21sdWlsZG55eXdud3ZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzMjE4NzgsImV4cCI6MjA3NDg5Nzg3OH0.UzmowWAwOWhAsrnQWcgESqLURwMqtWFx_8FW5znngD0`  
+**Value:** `***REDACTED***`  
 **Environment:** All (Production, Preview, Development)
 
 **Name:** `NEXT_PUBLIC_CONTRACT_ADDRESS_TESTNET`  
@@ -153,12 +153,12 @@ Create a `.env.production` file:
 
 ```bash
 # CRITICAL - Backend Only
-SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtiYXl5b21sdWlsZG55eXdud3ZzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1OTMyMTg3OCwiZXhwIjoyMDc0ODk3ODc4fQ.aCj52DNWUPJ83nRoeDiiUzbB68nvzoQP5Qw7JbQck0s
-VERIFIER_PRIVATE_KEY=0xe96ea4ad33f182e9851a473662bbe2d44b45ef4d4826e7a8ed8211949ea665fc
+SUPABASE_SERVICE_ROLE_KEY=***REDACTED***
+VERIFIER_PRIVATE_KEY=***REDACTED***
 
 # Public Variables
 NEXT_PUBLIC_SUPABASE_URL=https://kbayyomluildnyywnwvs.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtiYXl5b21sdWlsZG55eXdud3ZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzMjE4NzgsImV4cCI6MjA3NDg5Nzg3OH0.UzmowWAwOWhAsrnQWcgESqLURwMqtWFx_8FW5znngD0
+NEXT_PUBLIC_SUPABASE_ANON_KEY=***REDACTED***
 NEXT_PUBLIC_CONTRACT_ADDRESS_TESTNET=0x6342e9382A422697D8B4DB77A1c3cc0ACE7327F7
 NEXT_PUBLIC_HELLOWORLD_ADDRESS=0x41D1eC3f323AF3eC84c194F780fF2a6B89ae5BaB
 NEXT_PUBLIC_XFI_TOKEN_ADDRESS=0x4e1ddF0808D8c0908568Afd1e76374eEeBf896C1

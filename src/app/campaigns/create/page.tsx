@@ -6,9 +6,10 @@ import { useWallet } from '@/contexts/WalletContext';
 import { ethers } from 'ethers';
 import { CONTRACT_ADDRESSES } from '@/lib/contracts';
 import { CROSS_ERA_REWARD_SYSTEM_ABI } from '@/lib/serverConfig';
-import { ensureCrossFiTestnet } from '@/lib/networkUtils';
+import { ensureCrossFiMainnet } from '@/lib/networkUtils';
 import { CampaignFormData, INITIAL_CAMPAIGN_DATA, CampaignCreationStep, CAMPAIGN_CATEGORIES } from '@/components/campaigns/types';
 import { NetworkWarning } from '@/components/shared/NetworkWarning';
+import { dateTimeLocalToUtc } from '@/lib/dateUtils';
 
 export default function CreateCampaignPage() {
   const router = useRouter();
@@ -121,22 +122,37 @@ export default function CreateCampaignPage() {
       }
 
       try {
-        await ensureCrossFiTestnet();
+        await ensureCrossFiMainnet();
       } catch (networkError) {
-        throw new Error('Please switch to CrossFi Testnet in MetaMask');
+        throw new Error('Please switch to CrossFi Mainnet in MetaMask');
       }
 
       // Step 2: Create campaign on blockchain
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
       const contract = new ethers.Contract(
-        CONTRACT_ADDRESSES.testnet,
+        CONTRACT_ADDRESSES.mainnet,
         CROSS_ERA_REWARD_SYSTEM_ABI,
         signer
       );
 
-      const startTimestamp = Math.floor(new Date(formData.start_date).getTime() / 1000);
-      const endTimestamp = Math.floor(new Date(formData.end_date).getTime() / 1000);
+      // Convert datetime-local input to UTC timestamps
+      // datetime-local inputs are in user's local timezone
+      const startDate = new Date(formData.start_date);
+      const endDate = new Date(formData.end_date);
+      
+      // Ensure we're using the same timestamps for both blockchain and database
+      const startTimestamp = Math.floor(startDate.getTime() / 1000);
+      const endTimestamp = Math.floor(endDate.getTime() / 1000);
+      
+      console.log('Campaign timestamps:', {
+        start_local: formData.start_date,
+        start_utc: startDate.toISOString(),
+        start_timestamp: startTimestamp,
+        end_local: formData.end_date,
+        end_utc: endDate.toISOString(),
+        end_timestamp: endTimestamp
+      });
       const poolAmount = ethers.parseEther(formData.total_pool);
 
       const tx = await contract.createCampaign(
@@ -170,8 +186,8 @@ export default function CreateCampaignPage() {
           logo_url: formData.logo_url,
           category: formData.category,
           total_pool: formData.total_pool,
-          start_date: formData.start_date,
-          end_date: formData.end_date,
+          start_date: new Date(formData.start_date).toISOString(),
+          end_date: new Date(formData.end_date).toISOString(),
           eligibility_criteria: formData.eligibility_criteria,
           terms_url: formData.terms_url,
           website_url: formData.website_url,
@@ -203,35 +219,37 @@ export default function CreateCampaignPage() {
   // Require wallet connection
   if (!isConnected) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="max-w-md bg-white border border-gray-200 rounded-lg p-8 text-center">
-          <div className="text-6xl mb-4">🔐</div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            Connect Your Wallet
-          </h2>
-          <p className="text-gray-600 mb-6">
-            Please connect your wallet to create a campaign.
-          </p>
-          <button
-            onClick={connect}
-            className="w-full px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Connect Wallet
-          </button>
+      <div className="min-h-screen gradient-bg-hero flex items-center justify-center">
+        <div className="w-full max-w-md mx-auto px-4">
+          <div className="glass-card p-8 text-center">
+            <div className="text-6xl mb-4">🔐</div>
+            <h2 className="text-2xl font-bold text-white mb-4">
+              Connect Your Wallet
+            </h2>
+            <p className="text-gray-300 mb-6">
+              Please connect your wallet to create a campaign.
+            </p>
+            <button
+              onClick={connect}
+              className="w-full px-6 py-3 glass-button text-white font-semibold rounded-lg transition-all"
+            >
+              Connect Wallet
+            </button>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen gradient-bg-hero pt-24 pb-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+        <div className="glass-card p-8 text-center mb-8">
+          <h1 className="text-3xl font-bold text-white mb-2">
             Create Campaign
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-300">
             Launch a reward campaign for CrossFi developers
           </p>
         </div>
@@ -242,17 +260,17 @@ export default function CreateCampaignPage() {
         )}
 
         {/* Form Container */}
-        <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-8">
+        <div className="glass-card p-8">
           {currentStep === 'basic-info' && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Basic Information</h2>
-                <p className="text-gray-600">Start with the essentials for your campaign</p>
+                <h2 className="text-2xl font-bold text-white mb-2">Basic Information</h2>
+                <p className="text-gray-300">Start with the essentials for your campaign</p>
               </div>
 
               {/* Campaign Name */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Campaign Name <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -260,7 +278,7 @@ export default function CreateCampaignPage() {
                   value={formData.name}
                   onChange={(e) => handleChange('name', e.target.value)}
                   placeholder="Summer DeFi Rewards"
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black ${
+                  className={`w-full px-4 py-3 bg-transparent border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white ${
                     errors.name ? 'border-red-500' : 'border-gray-300'
                   }`}
                 />
@@ -271,7 +289,7 @@ export default function CreateCampaignPage() {
 
               {/* Description */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Description
                 </label>
                 <textarea
@@ -279,22 +297,22 @@ export default function CreateCampaignPage() {
                   onChange={(e) => handleChange('description', e.target.value)}
                   rows={4}
                   placeholder="Describe your campaign and its goals..."
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black"
+                  className="w-full px-4 py-3 bg-transparent border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white"
                 />
-                <p className="mt-1 text-sm text-gray-500">
+                <p className="mt-1 text-sm text-gray-400">
                   {formData.description.length}/2000 characters
                 </p>
               </div>
 
               {/* Category */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Category <span className="text-red-500">*</span>
                 </label>
                 <select
                   value={formData.category}
                   onChange={(e) => handleChange('category', e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black"
+                  className="w-full px-4 py-3 bg-transparent border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white"
                 >
                   {CAMPAIGN_CATEGORIES.map(cat => (
                     <option key={cat} value={cat}>{cat}</option>
@@ -305,7 +323,7 @@ export default function CreateCampaignPage() {
               <div className="flex justify-end">
                 <button
                   onClick={handleNext}
-                  className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                  className="px-6 py-3 glass-button text-white font-semibold rounded-lg transition-all"
                 >
                   Next
                 </button>
@@ -316,13 +334,13 @@ export default function CreateCampaignPage() {
           {currentStep === 'details' && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Campaign Details</h2>
-                <p className="text-gray-600">Set up the reward pool and timeline</p>
+                <h2 className="text-2xl font-bold text-white mb-2">Campaign Details</h2>
+                <p className="text-gray-300">Set up the reward pool and timeline</p>
               </div>
 
               {/* Total Pool */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Total Pool (XFI) <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -331,28 +349,28 @@ export default function CreateCampaignPage() {
                   value={formData.total_pool}
                   onChange={(e) => handleChange('total_pool', e.target.value)}
                   placeholder="1000"
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black ${
+                  className={`w-full px-4 py-3 bg-transparent border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white ${
                     errors.total_pool ? 'border-red-500' : 'border-gray-300'
                   }`}
                 />
                 {errors.total_pool && (
                   <p className="mt-1 text-sm text-red-600">{errors.total_pool}</p>
                 )}
-                <p className="mt-1 text-sm text-gray-500">
+                <p className="mt-1 text-sm text-gray-400">
                   Amount of XFI to allocate for rewards
                 </p>
               </div>
 
               {/* Start Date */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Start Date <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="datetime-local"
                   value={formData.start_date}
                   onChange={(e) => handleChange('start_date', e.target.value)}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black ${
+                  className={`w-full px-4 py-3 bg-transparent border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white ${
                     errors.start_date ? 'border-red-500' : 'border-gray-300'
                   }`}
                 />
@@ -363,14 +381,14 @@ export default function CreateCampaignPage() {
 
               {/* End Date */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   End Date <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="datetime-local"
                   value={formData.end_date}
                   onChange={(e) => handleChange('end_date', e.target.value)}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black ${
+                  className={`w-full px-4 py-3 bg-transparent border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white ${
                     errors.end_date ? 'border-red-500' : 'border-gray-300'
                   }`}
                 />
@@ -381,7 +399,7 @@ export default function CreateCampaignPage() {
 
               {/* Eligibility Criteria */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Eligibility Criteria
                 </label>
                 <textarea
@@ -389,20 +407,20 @@ export default function CreateCampaignPage() {
                   onChange={(e) => handleChange('eligibility_criteria', e.target.value)}
                   rows={3}
                   placeholder="Who can participate in this campaign..."
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black"
+                  className="w-full px-4 py-3 bg-transparent border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white"
                 />
               </div>
 
               <div className="flex justify-between">
                 <button
                   onClick={handleBack}
-                  className="px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
+                  className="px-6 py-3 text-gray-300 font-semibold rounded-lg hover:text-white hover:bg-transparent hover:bg-opacity-10 transition-all"
                 >
                   Back
                 </button>
                 <button
                   onClick={handleNext}
-                  className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                  className="px-6 py-3 glass-button text-white font-semibold rounded-lg transition-all"
                 >
                   Next
                 </button>
@@ -413,13 +431,13 @@ export default function CreateCampaignPage() {
           {currentStep === 'links' && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Links & Resources</h2>
-                <p className="text-gray-600">Add social links and resources (optional)</p>
+                <h2 className="text-2xl font-bold text-white mb-2">Links & Resources</h2>
+                <p className="text-gray-300">Add social links and resources (optional)</p>
               </div>
 
               {/* Logo URL */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Logo URL
                 </label>
                 <input
@@ -427,13 +445,13 @@ export default function CreateCampaignPage() {
                   value={formData.logo_url}
                   onChange={(e) => handleChange('logo_url', e.target.value)}
                   placeholder="https://..."
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black"
+                  className="w-full px-4 py-3 bg-transparent border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white"
                 />
               </div>
 
               {/* Banner URL */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Banner URL
                 </label>
                 <input
@@ -441,13 +459,13 @@ export default function CreateCampaignPage() {
                   value={formData.banner_image_url}
                   onChange={(e) => handleChange('banner_image_url', e.target.value)}
                   placeholder="https://..."
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black"
+                  className="w-full px-4 py-3 bg-transparent border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white"
                 />
               </div>
 
               {/* Website URL */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Website URL
                 </label>
                 <input
@@ -455,13 +473,13 @@ export default function CreateCampaignPage() {
                   value={formData.website_url}
                   onChange={(e) => handleChange('website_url', e.target.value)}
                   placeholder="https://..."
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black"
+                  className="w-full px-4 py-3 bg-transparent border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white"
                 />
               </div>
 
               {/* Twitter URL */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Twitter URL
                 </label>
                 <input
@@ -469,13 +487,13 @@ export default function CreateCampaignPage() {
                   value={formData.twitter_url}
                   onChange={(e) => handleChange('twitter_url', e.target.value)}
                   placeholder="https://twitter.com/..."
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black"
+                  className="w-full px-4 py-3 bg-transparent border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white"
                 />
               </div>
 
               {/* Discord URL */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Discord URL
                 </label>
                 <input
@@ -483,20 +501,20 @@ export default function CreateCampaignPage() {
                   value={formData.discord_url}
                   onChange={(e) => handleChange('discord_url', e.target.value)}
                   placeholder="https://discord.gg/..."
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black"
+                  className="w-full px-4 py-3 bg-transparent border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white"
                 />
               </div>
 
               <div className="flex justify-between">
                 <button
                   onClick={handleBack}
-                  className="px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
+                  className="px-6 py-3 text-gray-300 font-semibold rounded-lg hover:text-white hover:bg-transparent hover:bg-opacity-10 transition-all"
                 >
                   Back
                 </button>
                 <button
                   onClick={handleNext}
-                  className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                  className="px-6 py-3 glass-button text-white font-semibold rounded-lg transition-all"
                 >
                   Review
                 </button>
@@ -507,41 +525,41 @@ export default function CreateCampaignPage() {
           {currentStep === 'review' && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Review Campaign</h2>
-                <p className="text-gray-600">Review all details before creating on-chain</p>
+                <h2 className="text-2xl font-bold text-white mb-2">Review Campaign</h2>
+                <p className="text-gray-300">Review all details before creating on-chain</p>
               </div>
 
-              <div className="bg-gray-50 rounded-lg p-6 space-y-4">
+              <div className="bg-transparent bg-opacity-10 rounded-lg p-6 space-y-4">
                 <div>
-                  <dt className="text-sm font-medium text-gray-500">Campaign Name</dt>
-                  <dd className="mt-1 text-lg font-semibold text-gray-900">{formData.name}</dd>
+                  <dt className="text-sm font-medium text-gray-400">Campaign Name</dt>
+                  <dd className="mt-1 text-lg font-semibold text-white">{formData.name}</dd>
                 </div>
                 {formData.description && (
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Description</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{formData.description}</dd>
+                    <dt className="text-sm font-medium text-gray-400">Description</dt>
+                    <dd className="mt-1 text-sm text-white">{formData.description}</dd>
                   </div>
                 )}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Total Pool</dt>
+                    <dt className="text-sm font-medium text-gray-400">Total Pool</dt>
                     <dd className="mt-1 text-lg font-bold text-blue-600">{formData.total_pool} XFI</dd>
                   </div>
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Category</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{formData.category}</dd>
+                    <dt className="text-sm font-medium text-gray-400">Category</dt>
+                    <dd className="mt-1 text-sm text-white">{formData.category}</dd>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Start Date</dt>
-                    <dd className="mt-1 text-sm text-gray-900">
+                    <dt className="text-sm font-medium text-gray-400">Start Date</dt>
+                    <dd className="mt-1 text-sm text-white">
                       {new Date(formData.start_date).toLocaleString()}
                     </dd>
                   </div>
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">End Date</dt>
-                    <dd className="mt-1 text-sm text-gray-900">
+                    <dt className="text-sm font-medium text-gray-400">End Date</dt>
+                    <dd className="mt-1 text-sm text-white">
                       {new Date(formData.end_date).toLocaleString()}
                     </dd>
                   </div>
@@ -557,13 +575,13 @@ export default function CreateCampaignPage() {
               <div className="flex justify-between">
                 <button
                   onClick={handleBack}
-                  className="px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
+                  className="px-6 py-3 text-gray-300 font-semibold rounded-lg hover:text-white hover:bg-transparent hover:bg-opacity-10 transition-all"
                 >
                   Back
                 </button>
                 <button
                   onClick={handleSubmit}
-                  className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                  className="px-6 py-3 glass-button text-white font-semibold rounded-lg transition-all"
                 >
                   Create Campaign
                 </button>
@@ -576,19 +594,19 @@ export default function CreateCampaignPage() {
               {blockchainStatus === 'signing' && (
                 <>
                   <div className="text-6xl mb-4 animate-pulse">✍️</div>
-                  <p className="text-lg font-medium text-gray-900">Waiting for signature...</p>
-                  <p className="text-sm text-gray-600 mt-2">Please confirm the transaction in MetaMask</p>
-                  <p className="text-sm text-gray-600 mt-4">Sending {formData.total_pool} XFI to contract</p>
+                  <p className="text-lg font-medium text-white">Waiting for signature...</p>
+                  <p className="text-sm text-gray-300 mt-2">Please confirm the transaction in MetaMask</p>
+                  <p className="text-sm text-gray-300 mt-4">Sending {formData.total_pool} XFI to contract</p>
                 </>
               )}
               {blockchainStatus === 'confirming' && (
                 <>
                   <div className="text-6xl mb-4 animate-spin">⏳</div>
-                  <p className="text-lg font-medium text-gray-900">Transaction confirming...</p>
-                  <p className="text-sm text-gray-600 mt-2">This may take a few moments</p>
+                  <p className="text-lg font-medium text-white">Transaction confirming...</p>
+                  <p className="text-sm text-gray-300 mt-2">This may take a few moments</p>
                   {txHash && (
                     <a
-                      href={`https://scan.testnet.crossfi.org/tx/${txHash}`}
+                      href={`https://scan.crossfi.org/tx/${txHash}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-sm text-blue-600 hover:underline mt-2 inline-block"
@@ -601,29 +619,29 @@ export default function CreateCampaignPage() {
               {blockchainStatus === 'confirmed' && (
                 <>
                   <div className="text-6xl mb-4">✅</div>
-                  <p className="text-lg font-medium text-gray-900">Transaction confirmed!</p>
-                  <p className="text-sm text-gray-600 mt-2">Campaign registered on blockchain</p>
+                  <p className="text-lg font-medium text-white">Transaction confirmed!</p>
+                  <p className="text-sm text-gray-300 mt-2">Campaign registered on blockchain</p>
                 </>
               )}
               {blockchainStatus === 'saving' && (
                 <>
                   <div className="text-6xl mb-4 animate-pulse">💾</div>
-                  <p className="text-lg font-medium text-gray-900">Saving campaign metadata...</p>
-                  <p className="text-sm text-gray-600 mt-2">Storing campaign details in database</p>
+                  <p className="text-lg font-medium text-white">Saving campaign metadata...</p>
+                  <p className="text-sm text-gray-300 mt-2">Storing campaign details in database</p>
                 </>
               )}
               {blockchainStatus === 'error' && (
                 <>
                   <div className="text-6xl mb-4">❌</div>
                   <p className="text-lg font-medium text-red-600">Campaign Creation Failed</p>
-                  <p className="text-sm text-gray-600 mt-2">{errorMessage}</p>
+                  <p className="text-sm text-gray-300 mt-2">{errorMessage}</p>
                   <button
                     onClick={() => {
                       setCurrentStep('review');
                       setBlockchainStatus('idle');
                       setErrorMessage('');
                     }}
-                    className="mt-4 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                    className="mt-4 px-6 py-3 glass-button text-white font-semibold rounded-lg transition-all"
                   >
                     Try Again
                   </button>
@@ -635,24 +653,24 @@ export default function CreateCampaignPage() {
           {currentStep === 'success' && (
             <div className="text-center py-8">
               <div className="text-6xl mb-4">🎉</div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              <h2 className="text-2xl font-bold text-white mb-2">
                 Campaign Created Successfully!
               </h2>
-              <p className="text-gray-600 mb-6">
+              <p className="text-gray-300 mb-6">
                 Your campaign has been registered on-chain and saved to the database
               </p>
 
-              <div className="bg-gray-50 rounded-lg p-6 mb-6 text-left">
+              <div className="bg-transparent bg-opacity-10 rounded-lg p-6 mb-6 text-left">
                 <dl className="space-y-3">
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Campaign ID</dt>
-                    <dd className="mt-1 text-lg font-bold text-gray-900">{campaignId}</dd>
+                    <dt className="text-sm font-medium text-gray-400">Campaign ID</dt>
+                    <dd className="mt-1 text-lg font-bold text-white">{campaignId}</dd>
                   </div>
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Transaction Hash</dt>
+                    <dt className="text-sm font-medium text-gray-400">Transaction Hash</dt>
                     <dd className="mt-1">
                       <a
-                        href={`https://scan.testnet.crossfi.org/tx/${txHash}`}
+                        href={`https://scan.crossfi.org/tx/${txHash}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-sm text-blue-600 hover:underline font-mono"
@@ -662,7 +680,7 @@ export default function CreateCampaignPage() {
                     </dd>
                   </div>
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Pool Amount</dt>
+                    <dt className="text-sm font-medium text-gray-400">Pool Amount</dt>
                     <dd className="mt-1 text-lg font-bold text-green-600">{formData.total_pool} XFI</dd>
                   </div>
                 </dl>
@@ -671,13 +689,13 @@ export default function CreateCampaignPage() {
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <button
                   onClick={() => router.push('/campaigns')}
-                  className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                  className="px-6 py-3 glass-button text-white font-semibold rounded-lg transition-all"
                 >
                   View All Campaigns
                 </button>
                 <button
                   onClick={() => router.push('/dashboard')}
-                  className="px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
+                  className="px-6 py-3 text-gray-300 font-semibold rounded-lg hover:text-white hover:bg-transparent hover:bg-opacity-10 transition-all"
                 >
                   Go to Dashboard
                 </button>

@@ -8,7 +8,7 @@ import { generateAppId } from '@/lib/uuid';
 import { CONTRACT_ADDRESSES } from '@/lib/contracts';
 import { CROSS_ERA_REWARD_SYSTEM_ABI } from '@/lib/serverConfig';
 import { validateStep1, validateStep2 } from '@/lib/formValidation';
-import { ensureCrossFiTestnet } from '@/lib/networkUtils';
+import { ensureCrossFiMainnet } from '@/lib/networkUtils';
 import { ProjectFormData, INITIAL_FORM_DATA, RegistrationStep } from '@/components/register/types';
 import { StepIndicator } from '@/components/register/StepIndicator';
 import { Step1BasicInfo } from '@/components/register/Step1BasicInfo';
@@ -129,17 +129,17 @@ export default function RegisterPage() {
         throw new Error('MetaMask not found. Please install MetaMask.');
       }
 
-      // Check and switch to CrossFi Testnet if needed
+      // Check and switch to CrossFi Mainnet if needed
       try {
-        await ensureCrossFiTestnet();
+        await ensureCrossFiMainnet();
       } catch (networkError) {
-        throw new Error('Please switch to CrossFi Testnet in MetaMask');
+        throw new Error('Please switch to CrossFi Mainnet in MetaMask');
       }
 
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
       const contract = new ethers.Contract(
-        CONTRACT_ADDRESSES.testnet,
+        CONTRACT_ADDRESSES.mainnet,
         CROSS_ERA_REWARD_SYSTEM_ABI,
         signer
       );
@@ -192,19 +192,19 @@ export default function RegisterPage() {
   // Not connected state
   if (!isConnected) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
-        <div className="max-w-md mx-auto px-4">
-          <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
+      <div className="min-h-screen gradient-bg-hero flex items-center justify-center">
+        <div className="w-full max-w-md mx-auto px-4">
+          <div className="glass-card p-8 text-center">
             <div className="text-6xl mb-4">🔐</div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            <h2 className="text-2xl font-bold text-white mb-4">
               Connect Your Wallet
             </h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-300 mb-6">
               Please connect your wallet to register a new project.
             </p>
             <button
               onClick={connect}
-              className="w-full px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+              className="w-full px-6 py-3 glass-button text-white font-semibold rounded-lg hover:bg-white hover:bg-opacity-20 transition-all"
             >
               Connect Wallet
             </button>
@@ -215,14 +215,14 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen gradient-bg-hero py-12">
+      <div className="w-full max-w-4xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold text-white mb-2">
             Register Your Project
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-300">
             Start earning rewards for your CrossFi transactions
           </p>
         </div>
@@ -236,7 +236,7 @@ export default function RegisterPage() {
         <StepIndicator currentStep={currentStep} />
 
         {/* Form Container */}
-        <div className="bg-white border border-gray-200 rounded-lg p-6 md:p-8 mb-6">
+        <div className="glass-card p-6 md:p-8 mb-6">
           {/* Step 1: Basic Info */}
           {currentStep === 'basic-info' && (
             <Step1BasicInfo
@@ -287,10 +287,10 @@ export default function RegisterPage() {
             <button
               onClick={handleBack}
               disabled={currentStep === 'basic-info'}
-              className={`px-6 py-3 rounded-lg font-semibold transition-colors ${
+              className={`px-6 py-3 rounded-lg font-semibold transition-all ${
                 currentStep === 'basic-info'
-                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  ? 'bg-white bg-opacity-10 text-gray-400 cursor-not-allowed border border-white border-opacity-20'
+                  : 'glass-button text-white hover:bg-white hover:bg-opacity-20'
               }`}
             >
               ← Back
@@ -299,14 +299,14 @@ export default function RegisterPage() {
             {currentStep === 'review' ? (
               <button
                 onClick={handleSubmit}
-                className="px-8 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors"
+                className="px-8 py-3 glass-button text-white rounded-lg font-semibold hover:bg-white hover:bg-opacity-20 transition-all"
               >
                 Submit & Register →
               </button>
             ) : (
               <button
                 onClick={handleNext}
-                className="px-8 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+                className="px-8 py-3 glass-button text-white rounded-lg font-semibold hover:bg-white hover:bg-opacity-20 transition-all"
               >
                 Continue →
               </button>
