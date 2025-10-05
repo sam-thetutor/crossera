@@ -21,25 +21,17 @@ export interface Project {
   // Links
   website_url?: string;
   logo_url?: string;
-  github_url?: string;
   twitter_url?: string;
   discord_url?: string;
+  banner_url?: string;
   
   // Blockchain Integration
   blockchain_tx_hash?: string;
-  blockchain_status: 'pending' | 'confirmed' | 'failed';
-  registered_on_chain: boolean;
   
   // Metadata
   created_at: string;
   updated_at: string;
   created_by: string;
-  
-  // Analytics
-  total_transactions: number;
-  total_rewards: string;
-  total_volume: string;
-  is_active: boolean;
 }
 
 export interface ProjectCampaign {
@@ -73,7 +65,6 @@ export interface ProjectStats {
   app_name: string;
   owner_address: string;
   category?: string;
-  blockchain_status: string;
   campaign_count: number;
   transaction_count: number;
   total_rewards: string;

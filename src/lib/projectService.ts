@@ -8,13 +8,7 @@ export const projectService = {
     const { data, error } = await supabase
       .from('projects')
       .insert([{
-        ...projectData,
-        blockchain_status: 'pending',
-        registered_on_chain: false,
-        total_transactions: 0,
-        total_rewards: '0',
-        total_volume: '0',
-        is_active: true
+        ...projectData
       }])
       .select()
       .single();
@@ -106,19 +100,16 @@ export const projectService = {
   },
 
   /**
-   * Update blockchain status
+   * Update blockchain registration
    */
-  async updateBlockchainStatus(
+  async updateBlockchainRegistration(
     appId: string,
-    txHash: string,
-    status: 'pending' | 'confirmed' | 'failed'
+    txHash: string
   ): Promise<Project> {
     const { data, error } = await supabase
       .from('projects')
       .update({
         blockchain_tx_hash: txHash,
-        blockchain_status: status,
-        registered_on_chain: status === 'confirmed',
         updated_at: new Date().toISOString()
       })
       .eq('app_id', appId)
@@ -126,8 +117,8 @@ export const projectService = {
       .single();
     
     if (error) {
-      console.error('Error updating blockchain status:', error);
-      throw new Error(`Failed to update status: ${error.message}`);
+      console.error('Error updating blockchain registration:', error);
+      throw new Error(`Failed to update registration: ${error.message}`);
     }
     
     return data;
@@ -231,9 +222,7 @@ export const projectService = {
   async getActiveProjectsCount(): Promise<number> {
     const { count, error } = await supabase
       .from('projects')
-      .select('*', { count: 'exact', head: true })
-      .eq('is_active', true)
-      .eq('registered_on_chain', true);
+      .select('*', { count: 'exact', head: true });
     
     if (error) {
       console.error('Error counting projects:', error);
