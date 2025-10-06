@@ -75,12 +75,27 @@ export async function GET(request: NextRequest) {
       return acc;
     }, {} as Record<string, number>);
 
+    // Get active campaigns count
+    let activeCampaigns = 0;
+    try {
+      const { count, error: campaignsErr } = await supabase
+        .from('campaigns')
+        .select('*', { count: 'exact', head: true })
+        .eq('is_active', true);
+      if (!campaignsErr) {
+        activeCampaigns = count || 0;
+      }
+    } catch (e) {
+      activeCampaigns = 0;
+    }
+
     return NextResponse.json({
       success: true,
       projectStats: filteredStats,
       platformStats: {
         totalProjects,
         activeProjects,
+        activeCampaigns,
         totalRewards: totalRewards.toString(),
         totalTransactions: totalTransactions || 0,
         categoriesDistribution: categories

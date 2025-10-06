@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 interface PlatformStats {
   totalProjects: number;
   activeProjects: number;
+  activeCampaigns: number;
   totalRewards: string;
   totalTransactions: number;
   categoriesDistribution: Record<string, number>;

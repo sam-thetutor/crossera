@@ -9,8 +9,8 @@ export function Hero() {
   const { isConnected, connect } = useWallet();
   const { stats, loading } = useProjectStats(undefined);
 
-  const totalProjects = stats?.totalProjects ?? 0;
   const activeProjects = stats?.activeProjects ?? 0;
+  const activeCampaigns = stats?.activeCampaigns ?? 0;
   const totalRewards = stats?.totalRewards ?? "0";
 
   return (
@@ -94,9 +94,9 @@ export function Hero() {
                   </p>
                 </div>
                 <div className="glass-button text-white rounded-lg p-3 text-center">
-                  <p className="text-xs text-gray-300">Total Projects</p>
+                  <p className="text-xs text-gray-300">Active Campaigns</p>
                   <p className="mt-1 text-lg font-semibold text-white">
-                    {loading ? "—" : totalProjects}
+                    {loading ? "—" : activeCampaigns}
                   </p>
                 </div>
                 <div className="glass-button text-white rounded-lg p-3 text-center">
