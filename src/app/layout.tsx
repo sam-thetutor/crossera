@@ -18,7 +18,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CrossEra - CrossFi Reward System",
+  title: "CrossEra - Retroactive funding on CrossFi",
   description: "A complete blockchain-based reward system for CrossFi applications",
 };
 
