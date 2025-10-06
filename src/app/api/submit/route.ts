@@ -29,6 +29,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check if transaction already exists in database
+    const { data: existingTx, error: checkError } = await supabase
+      .from('transactions')
+      .select('*')
+      .eq('tx_hash', transaction_hash)
+      .maybeSingle();
+
+    if (checkError) {
+      console.error('Error checking existing transaction:', checkError);
+    }
+
+    if (existingTx) {
+      console.log('Transaction already processed:', transaction_hash);
+      return NextResponse.json({
+        success: true,
+        message: 'Transaction already processed',
+        transaction: existingTx,
+        alreadyProcessed: true
+      });
+    }
+
     // Create provider with retry configuration
     const provider = new ethers.JsonRpcProvider(SERVER_CONFIG.rpcUrl, undefined, {
       staticNetwork: true,
@@ -276,7 +297,15 @@ export async function POST(request: NextRequest) {
 
     if (dbError) {
       console.error('Database error:', dbError);
-      // Don't fail the request if DB save fails - transaction is already processed on-chain
+      
+      // If it's a duplicate key error, it means the transaction was already saved
+      // This can happen in rare race conditions - it's not a critical error
+      if (dbError.code === '23505') {
+        console.log('Transaction already exists in database (race condition), continuing...');
+      } else {
+        // For other errors, log but don't fail - transaction is already processed on-chain
+        console.error('Failed to save transaction to database, but on-chain processing succeeded');
+      }
     }
 
     // Check campaign status for all registered campaigns
