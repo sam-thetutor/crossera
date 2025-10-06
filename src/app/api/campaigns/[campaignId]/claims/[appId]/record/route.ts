@@ -70,8 +70,7 @@ export async function POST(
       );
     }
 
-    // Update the campaign's distributed_rewards
-    // First get current distributed rewards
+    // Update the campaign's distributed_rewards (keep in WEI format)
     const { data: campaign, error: campaignError } = await supabase
       .from('campaigns')
       .select('distributed_rewards')
@@ -79,24 +78,38 @@ export async function POST(
       .single();
 
     if (!campaignError && campaign) {
-      const currentDistributed = parseFloat(campaign.distributed_rewards || '0');
-      const claimAmountFloat = parseFloat(claimAmount);
-      const newDistributed = currentDistributed + claimAmountFloat;
+      try {
+        // Use BigInt to maintain WEI precision
+        const currentDistributedWei = BigInt(campaign.distributed_rewards || '0');
+        const claimAmountWei = BigInt(claimAmount);
+        const newDistributedWei = currentDistributedWei + claimAmountWei;
 
-      // Update the campaign with new distributed amount
-      const { error: updateError } = await supabase
-        .from('campaigns')
-        .update({ 
-          distributed_rewards: newDistributed.toString()
-        })
-        .eq('campaign_id', parseInt(campaignId));
+        console.log(`📊 Updating campaign ${campaignId} distributed rewards:`);
+        console.log(`   Current: ${currentDistributedWei.toString()} wei`);
+        console.log(`   Adding:  ${claimAmountWei.toString()} wei`);
+        console.log(`   New:     ${newDistributedWei.toString()} wei`);
 
-      if (updateError) {
-        console.error('Error updating campaign distributed rewards:', updateError);
-        // Don't fail the request - the claim was recorded successfully
-      } else {
-        console.log(`Updated campaign ${campaignId} distributed rewards from ${currentDistributed} to ${newDistributed}`);
+        // Update the campaign with new distributed amount
+        const { error: updateError } = await supabase
+          .from('campaigns')
+          .update({ 
+            distributed_rewards: newDistributedWei.toString()
+          })
+          .eq('campaign_id', parseInt(campaignId));
+
+        if (updateError) {
+          console.error('❌ Error updating campaign distributed rewards:', updateError);
+          // Don't fail the request - the claim was recorded successfully
+        } else {
+          console.log(`✅ Successfully updated campaign ${campaignId} distributed rewards`);
+        }
+      } catch (bigIntError) {
+        console.error('❌ Error calculating distributed rewards with BigInt:', bigIntError);
+        console.error('   Current value:', campaign.distributed_rewards);
+        console.error('   Claim amount:', claimAmount);
       }
+    } else if (campaignError) {
+      console.error('❌ Error fetching campaign for distributed update:', campaignError);
     }
 
     return NextResponse.json({
