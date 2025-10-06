@@ -327,28 +327,36 @@ function AppClaimCard({ app, campaignId, campaign, onClaimSuccess }: AppClaimCar
       console.log('Claim transaction confirmed:', receipt);
 
       // Get the actual claim amount from the transaction receipt
-      // Look for Transfer events to get the actual amount transferred
-      let actualClaimAmount = app.estimatedReward;
+      // Look for RewardsClaimed event to get the actual amount
+      let actualClaimAmountWei = ethers.parseEther(app.estimatedReward).toString();
+      
       if (receipt.logs) {
         for (const log of receipt.logs) {
           try {
             const parsedLog = contract.interface.parseLog(log);
-            if (parsedLog && parsedLog.name === 'Transfer') {
-              // This is a transfer event, get the amount
-              const amount = parsedLog.args.value;
+            if (parsedLog && parsedLog.name === 'RewardsClaimed') {
+              // This is the rewards claimed event
+              const amount = parsedLog.args.amount || parsedLog.args[3];
               if (amount) {
-                actualClaimAmount = ethers.formatEther(amount);
-                console.log('Actual claim amount from transfer event:', actualClaimAmount);
+                actualClaimAmountWei = amount.toString();
+                console.log('Actual claim amount from event:', ethers.formatEther(amount), 'XFI');
+                console.log('In wei:', actualClaimAmountWei);
                 break;
               }
             }
           } catch (e) {
-            // Not a transfer event, continue
+            // Not a RewardsClaimed event, continue
           }
         }
       }
 
-      // Update the database with the claim information
+      console.log('📊 Recording claim to database:', {
+        claimTxHash: receipt.hash,
+        claimAmountWei: actualClaimAmountWei,
+        claimAmountXFI: ethers.formatEther(actualClaimAmountWei)
+      });
+
+      // Update the database with the claim information (amount in WEI format)
       const recordResponse = await fetch(`/api/campaigns/${campaignId}/claims/${app.appId}/record`, {
         method: 'POST',
         headers: {
@@ -356,8 +364,8 @@ function AppClaimCard({ app, campaignId, campaign, onClaimSuccess }: AppClaimCar
         },
         body: JSON.stringify({
           claimTxHash: receipt.hash,
-          claimAmount: actualClaimAmount,
-          claimedBy: address, // Include the user's wallet address
+          claimAmount: actualClaimAmountWei,  // Send in WEI format
+          claimedBy: address,
         }),
       });
 
