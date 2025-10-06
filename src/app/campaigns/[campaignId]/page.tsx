@@ -81,8 +81,13 @@ export default function CampaignDetailsPage() {
         throw new Error(data.error || 'Campaign not found');
       }
 
+      console.log('Fetched campaign data:', data.campaign);
+      console.log('Total pool:', data.campaign.total_pool);
+      console.log('Distributed rewards:', data.campaign.distributed_rewards);
+      
       setCampaign(data.campaign);
     } catch (err) {
+      console.error('Error fetching campaign:', err);
       setError(err instanceof Error ? err.message : 'Failed to load campaign');
     } finally {
       setLoading(false);
@@ -111,8 +116,16 @@ export default function CampaignDetailsPage() {
   // Format wei values to XFI with proper decimals
   const formatPoolValue = (weiValue: string, decimals: number = 3): string => {
     try {
-      return parseFloat(ethers.formatEther(weiValue)).toFixed(decimals);
+      if (!weiValue || weiValue === '0' || weiValue === '') {
+        return '0.000';
+      }
+      // Log for debugging
+      console.log('Formatting value:', weiValue);
+      const formatted = parseFloat(ethers.formatEther(weiValue)).toFixed(decimals);
+      console.log('Formatted result:', formatted);
+      return formatted;
     } catch (e) {
+      console.error('Error formatting pool value:', e, 'Value:', weiValue);
       return '0.000';
     }
   };
