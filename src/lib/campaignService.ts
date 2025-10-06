@@ -1,4 +1,7 @@
-import { supabase } from './supabase';
+import { supabaseAdmin } from './supabase';
+
+// Use supabaseAdmin for server-side operations
+const supabase = supabaseAdmin!;
 
 export interface Campaign {
   id: string;

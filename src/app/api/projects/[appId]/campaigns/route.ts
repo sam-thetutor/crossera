@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase';
+
+const supabase = supabaseAdmin!;
 
 // POST /api/projects/[appId]/campaigns - Register app for campaign
 export async function POST(
@@ -54,8 +56,8 @@ export async function POST(
         project_id: project.id,
         campaign_id: campaign_id,
         registration_tx_hash: registration_tx_hash || null,
-        registration_fee: '0',
-        is_active: true
+        registration_fee: '0'
+        // Note: is_active defaults to TRUE in database
       })
       .select()
       .single();

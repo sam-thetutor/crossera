@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { projectService } from '@/lib/projectService';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase';
+
+const supabase = supabaseAdmin!;
 
 // GET /api/projects/stats - Get project statistics
 export async function GET(request: NextRequest) {

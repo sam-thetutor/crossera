@@ -86,7 +86,7 @@ export interface ProjectStats {
   transaction_count: number;
   total_rewards: string;
   total_volume: string;
-  created_at: string;
+  last_updated: string;
 }
 
 // Helper types

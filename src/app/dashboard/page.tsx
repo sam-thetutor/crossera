@@ -86,7 +86,7 @@ export default function DashboardPage() {
           (() => {
             // Derive per-user stats from fetched projects to avoid mismatches
             const derivedTotalProjects = projects?.length || 0;
-            const derivedActiveProjects = (projects || []).filter(p => (p as any).is_active && (p as any).registered_on_chain).length;
+            const derivedActiveProjects = (projects || []).filter(p => (p as any).blockchain_tx_hash).length;
             const derivedTotalRewardsNum = (projects || []).reduce((sum, p: any) => {
               const val = typeof p.total_rewards === 'string' ? parseFloat(p.total_rewards) : Number(p.total_rewards || 0);
               return sum + (isNaN(val) ? 0 : val);

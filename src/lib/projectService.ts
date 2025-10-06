@@ -29,7 +29,11 @@ export const projectService = {
    * Get all projects
    */
   async getAllProjects(): Promise<Project[]> {
-    const { data, error } = await supabase
+    if (!supabaseAdmin) {
+      throw new Error('Supabase admin client not available');
+    }
+    
+    const { data, error } = await supabaseAdmin
       .from('projects')
       .select('*')
       .order('created_at', { ascending: false });
@@ -46,7 +50,11 @@ export const projectService = {
    * Get projects by owner address
    */
   async getProjectsByOwner(ownerAddress: string): Promise<Project[]> {
-    const { data, error } = await supabase
+    if (!supabaseAdmin) {
+      throw new Error('Supabase admin client not available');
+    }
+    
+    const { data, error } = await supabaseAdmin
       .from('projects')
       .select('*')
       .eq('owner_address', ownerAddress.toLowerCase())
@@ -64,7 +72,11 @@ export const projectService = {
    * Get project by app_id
    */
   async getProjectByAppId(appId: string): Promise<Project | null> {
-    const { data, error } = await supabase
+    if (!supabaseAdmin) {
+      throw new Error('Supabase admin client not available');
+    }
+    
+    const { data, error } = await supabaseAdmin
       .from('projects')
       .select('*')
       .eq('app_id', appId)
@@ -86,7 +98,11 @@ export const projectService = {
    * Get project by ID
    */
   async getProjectById(id: string): Promise<Project | null> {
-    const { data, error } = await supabase
+    if (!supabaseAdmin) {
+      throw new Error('Supabase admin client not available');
+    }
+    
+    const { data, error } = await supabaseAdmin
       .from('projects')
       .select('*')
       .eq('id', id)
@@ -110,7 +126,11 @@ export const projectService = {
     appId: string,
     txHash: string
   ): Promise<Project> {
-    const { data, error } = await supabase
+    if (!supabaseAdmin) {
+      throw new Error('Supabase admin client not available');
+    }
+    
+    const { data, error } = await supabaseAdmin
       .from('projects')
       .update({
         blockchain_tx_hash: txHash,
@@ -132,7 +152,11 @@ export const projectService = {
    * Update project
    */
   async updateProject(appId: string, updates: ProjectUpdate): Promise<Project> {
-    const { data, error } = await supabase
+    if (!supabaseAdmin) {
+      throw new Error('Supabase admin client not available');
+    }
+    
+    const { data, error } = await supabaseAdmin
       .from('projects')
       .update({
         ...updates,
@@ -154,7 +178,11 @@ export const projectService = {
    * Delete project
    */
   async deleteProject(appId: string): Promise<void> {
-    const { error } = await supabase
+    if (!supabaseAdmin) {
+      throw new Error('Supabase admin client not available');
+    }
+    
+    const { error } = await supabaseAdmin
       .from('projects')
       .delete()
       .eq('app_id', appId);
@@ -169,7 +197,11 @@ export const projectService = {
    * Get projects by category
    */
   async getProjectsByCategory(category: string): Promise<Project[]> {
-    const { data, error } = await supabase
+    if (!supabaseAdmin) {
+      throw new Error('Supabase admin client not available');
+    }
+    
+    const { data, error } = await supabaseAdmin
       .from('projects')
       .select('*')
       .eq('category', category)
@@ -187,17 +219,29 @@ export const projectService = {
    * Get project statistics
    */
   async getProjectStats(): Promise<ProjectStats[]> {
-    const { data, error } = await supabase
-      .from('project_user_stats')
-      .select('*')
-      .order('created_at', { ascending: false });
-    
-    if (error) {
-      console.error('Error fetching project stats:', error);
-      throw new Error(`Failed to fetch stats: ${error.message}`);
+    if (!supabaseAdmin) {
+      console.error('Supabase admin client not available');
+      return [];
     }
     
-    return data || [];
+    try {
+      const { data, error } = await supabaseAdmin
+        .from('project_user_stats')
+        .select('*')
+        .order('last_updated', { ascending: false });
+      
+      if (error) {
+        console.error('Error fetching project stats:', error);
+        // Return empty array instead of throwing error to prevent API failures
+        return [];
+      }
+      
+      return data || [];
+    } catch (err) {
+      console.error('Exception fetching project stats:', err);
+      // Return empty array for any unexpected errors
+      return [];
+    }
   },
 
   /**
@@ -228,7 +272,11 @@ export const projectService = {
    * Get active projects count
    */
   async getActiveProjectsCount(): Promise<number> {
-    const { count, error } = await supabase
+    if (!supabaseAdmin) {
+      throw new Error('Supabase admin client not available');
+    }
+    
+    const { count, error } = await supabaseAdmin
       .from('projects')
       .select('*', { count: 'exact', head: true });
     
@@ -244,7 +292,11 @@ export const projectService = {
    * Search projects by name or description
    */
   async searchProjects(query: string): Promise<Project[]> {
-    const { data, error } = await supabase
+    if (!supabaseAdmin) {
+      throw new Error('Supabase admin client not available');
+    }
+    
+    const { data, error } = await supabaseAdmin
       .from('projects')
       .select('*')
       .or(`app_name.ilike.%${query}%,description.ilike.%${query}%`)
@@ -264,6 +316,22 @@ export const projectService = {
   async updateBlockchainStatus(appId: string, txHash: string, status: string): Promise<Project> {
     if (!supabaseAdmin) {
       throw new Error('Supabase admin client not available');
+    }
+
+    // First check if project exists
+    const { data: existingProject, error: checkError } = await supabaseAdmin
+      .from('projects')
+      .select('app_id')
+      .eq('app_id', appId)
+      .maybeSingle();
+
+    if (checkError) {
+      console.error('Error checking project existence:', checkError);
+      throw new Error(`Failed to check project: ${checkError.message}`);
+    }
+
+    if (!existingProject) {
+      throw new Error(`Project with app_id '${appId}' not found. Please create the project first.`);
     }
 
     const updateData: any = {};

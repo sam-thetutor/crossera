@@ -7,3 +7,4 @@ ADD COLUMN IF NOT EXISTS blockchain_tx_hash TEXT;
 
 -- Add a comment to describe the column
 COMMENT ON COLUMN public.projects.blockchain_tx_hash IS 'Transaction hash of the blockchain registration transaction';
+

@@ -20,9 +20,9 @@ export function SendXFITab({ onSuccess }: SendXFITabProps) {
     autoFetch: isConnected
   });
   
-  // Filter only on-chain registered projects
+  // Filter only on-chain registered projects (those with blockchain_tx_hash)
   const projects = useMemo(() => {
-    return allProjects.filter((p: any) => p.registered_on_chain);
+    return allProjects.filter((p: any) => p.blockchain_tx_hash);
   }, [allProjects]);
   
   const [selectedAppId, setSelectedAppId] = useState('');

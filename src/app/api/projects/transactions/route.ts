@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase';
+
+const supabase = supabaseAdmin!;
 
 // POST /api/projects/transactions - Record a new transaction
 export async function POST(request: NextRequest) {
