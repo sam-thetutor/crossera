@@ -554,7 +554,14 @@ export default function CampaignDetailsPage() {
                 {activeTab === 'claims' && campaign && isConnected && (
                   <CampaignClaimsSection 
                     campaignId={campaign.campaign_id}
-                    onClaimSuccess={fetchCampaign}
+                    onClaimSuccess={async () => {
+                      console.log('🔄 Parent onClaimSuccess called, refreshing campaign...');
+                      await fetchCampaign();
+                      console.log('✅ Parent campaign refreshed, new state:', {
+                        totalPool: campaign?.total_pool,
+                        distributedRewards: campaign?.distributed_rewards
+                      });
+                    }}
                   />
                 )}
 
