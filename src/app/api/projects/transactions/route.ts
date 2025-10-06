@@ -129,7 +129,7 @@ export async function GET(request: NextRequest) {
       query = query.eq('tx_hash', tx_hash);
     }
 
-    query = query.order('processed_at', { ascending: false }).limit(limit);
+    query = query.order('created_at', { ascending: false }).limit(limit);
 
     const { data, error } = await query;
 

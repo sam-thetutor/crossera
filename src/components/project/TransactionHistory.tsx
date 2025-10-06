@@ -125,7 +125,7 @@ export function TransactionHistory({ projectId }: TransactionHistoryProps) {
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
                     <span className="text-sm text-gray-400">
-                      {formatDate(tx.processed_at)}
+                      {formatDate(tx.created_at)}
                     </span>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">

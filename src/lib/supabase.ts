@@ -72,7 +72,7 @@ export interface Transaction {
   fee_generated?: string;
   reward_calculated?: string;
   transaction_type?: string;
-  processed_at: string;
+  created_at: string;
   verified_by?: string;
 }
 

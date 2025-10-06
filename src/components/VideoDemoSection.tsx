@@ -17,19 +17,14 @@ export function VideoDemoSection() {
           {/* Video Container */}
           <div className="relative max-w-4xl mx-auto">
             <div className="aspect-video bg-gray-900 rounded-lg shadow-2xl overflow-hidden">
-              <div className="flex items-center justify-center h-full">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M8 5v10l8-5-8-5z" />
-                    </svg>
-                  </div>
-                  <h3 className="text-2xl font-semibold mb-2 text-white">Demo Video Coming Soon</h3>
-                  <p className="text-gray-300">
-                    We're preparing an interactive demo showing the complete CrossEra workflow
-                  </p>
-                </div>
-              </div>
+              <iframe
+                className="w-full h-full"
+                src="https://www.youtube.com/embed/KTMbx9H__MA"
+                title="CrossEra Demo Video"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              ></iframe>
             </div>
           </div>
 

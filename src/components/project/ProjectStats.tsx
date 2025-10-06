@@ -19,19 +19,19 @@ export function ProjectStats({ project }: ProjectStatsProps) {
   const stats = [
     {
       label: 'Total Transactions',
-      value: project.total_transactions.toString(),
+      value: (project.total_transactions ?? 0).toString(),
       icon: '📊',
       color: 'blue'
     },
     {
       label: 'Total Rewards',
-      value: `${formatRewards(project.total_rewards)} XFI`,
+      value: `${formatRewards(project.total_rewards ?? '0')} XFI`,
       icon: '💰',
       color: 'green'
     },
     {
       label: 'Total Volume',
-      value: `${formatRewards(project.total_volume)} XFI`,
+      value: `${formatRewards(project.total_volume ?? '0')} XFI`,
       icon: '📈',
       color: 'purple'
     },
