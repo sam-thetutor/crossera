@@ -16,6 +16,15 @@ export async function POST(
     const body = await request.json();
     const { claimTxHash, claimAmount, claimedBy } = body;
 
+    console.log('📥 /record endpoint called:', {
+      campaignId,
+      appId,
+      claimTxHash,
+      claimAmount,
+      claimAmountType: typeof claimAmount,
+      claimedBy
+    });
+
     if (!claimTxHash || !claimAmount || !claimedBy) {
       return NextResponse.json(
         { error: 'Missing required fields: claimTxHash, claimAmount, claimedBy' },
