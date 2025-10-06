@@ -29,14 +29,18 @@ export async function POST(
     );
 
     const contractData = await contract.getCampaign(campaignId);
+    
+    // Get registered apps count from blockchain
+    const registeredAppsCount = await contract.getCampaignAppCount(campaignId);
 
-    // 2. Update database
+    // 2. Update database with blockchain data
     const { data: updatedCampaign, error: updateError } = await supabase
       .from('campaigns')
       .update({
         is_active: contractData.active,
         total_pool: contractData.totalPool.toString(),
-        distributed_rewards: contractData.distributedRewards.toString()
+        distributed_rewards: contractData.distributedRewards.toString(),
+        registered_apps_count: Number(registeredAppsCount)
       })
       .eq('campaign_id', campaignId)
       .select()

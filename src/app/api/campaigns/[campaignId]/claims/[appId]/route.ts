@@ -245,17 +245,19 @@ export async function POST(
 async function syncCampaignFromBlockchain(campaignId: number) {
   try {
     const contractCampaign = await contract.getCampaign(campaignId);
+    const registeredAppsCount = await contract.getCampaignAppCount(campaignId);
     
     await supabase
       .from('campaigns')
       .update({
         total_pool: contractCampaign.totalPool.toString(),
         distributed_rewards: contractCampaign.distributedRewards.toString(),
-        is_active: contractCampaign.active
+        is_active: contractCampaign.active,
+        registered_apps_count: Number(registeredAppsCount)
       })
       .eq('campaign_id', campaignId);
     
-    console.log(`✅ Synced campaign ${campaignId} from blockchain`);
+    console.log(`✅ Synced campaign ${campaignId} from blockchain (${registeredAppsCount} apps)`);
   } catch (error) {
     console.error(`❌ Failed to sync campaign ${campaignId}:`, error);
     throw error;
