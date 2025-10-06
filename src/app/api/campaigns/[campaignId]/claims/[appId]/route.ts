@@ -137,6 +137,7 @@ export async function POST(
     const feesGenerated = parseFloat(ethers.formatEther(appMetrics.totalFees));
     const volumeGenerated = parseFloat(ethers.formatEther(appMetrics.totalVolume));
     const estimatedReward = parseFloat(ethers.formatEther(appMetrics.estimatedReward));
+    const estimatedRewardWei = appMetrics.estimatedReward.toString(); // Keep wei for database
 
     if (estimatedReward <= 0) {
       return NextResponse.json(
@@ -190,8 +191,7 @@ export async function POST(
         );
       }
 
-      // Update campaign's distributed_rewards in database
-      // First get current distributed rewards
+      // Update campaign's distributed_rewards in database (keep in WEI format)
       const { data: campaign, error: campaignError } = await supabase
         .from('campaigns')
         .select('distributed_rewards')
@@ -199,23 +199,34 @@ export async function POST(
         .single();
 
       if (!campaignError && campaign) {
-        const currentDistributed = parseFloat(campaign.distributed_rewards || '0');
-        const newDistributed = currentDistributed + estimatedReward;
+        try {
+          // Work with BigInt to maintain WEI precision
+          const currentDistributedWei = BigInt(campaign.distributed_rewards || '0');
+          const rewardWei = BigInt(estimatedRewardWei);
+          const newDistributedWei = currentDistributedWei + rewardWei;
 
-        // Update the campaign with new distributed amount
-        const { error: updateError } = await supabase
-          .from('campaigns')
-          .update({ 
-            distributed_rewards: newDistributed.toString()
-          })
-          .eq('campaign_id', campaignIdNum);
+          // Update the campaign with new distributed amount
+          const { error: updateError } = await supabase
+            .from('campaigns')
+            .update({ 
+              distributed_rewards: newDistributedWei.toString()
+            })
+            .eq('campaign_id', campaignIdNum);
 
-        if (updateError) {
-          console.error('Error updating campaign distributed rewards:', updateError);
-          // Don't fail the request - the claim was successful
-        } else {
-          console.log(`✅ Updated campaign ${campaignIdNum} distributed rewards from ${currentDistributed} to ${newDistributed}`);
+          if (updateError) {
+            console.error('❌ Error updating campaign distributed rewards:', updateError);
+            // Don't fail the request - the claim was successful
+          } else {
+            console.log(`✅ Updated campaign ${campaignIdNum} distributed rewards:`);
+            console.log(`   From: ${currentDistributedWei.toString()} wei (${ethers.formatEther(currentDistributedWei)} XFI)`);
+            console.log(`   Added: ${rewardWei.toString()} wei (${ethers.formatEther(rewardWei)} XFI)`);
+            console.log(`   To: ${newDistributedWei.toString()} wei (${ethers.formatEther(newDistributedWei)} XFI)`);
+          }
+        } catch (bigIntError) {
+          console.error('❌ Error calculating distributed rewards with BigInt:', bigIntError);
         }
+      } else if (campaignError) {
+        console.error('❌ Error fetching campaign for distributed update:', campaignError);
       }
 
       return NextResponse.json({
