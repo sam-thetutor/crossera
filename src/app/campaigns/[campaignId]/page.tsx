@@ -74,12 +74,26 @@ export default function CampaignDetailsPage() {
   const fetchCampaign = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/campaigns/${campaignId}`);
+      // Add cache-busting timestamp to prevent stale data
+      const timestamp = new Date().getTime();
+      const response = await fetch(`/api/campaigns/${campaignId}?_t=${timestamp}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache'
+        }
+      });
       const data = await response.json();
 
       if (!data.success) {
         throw new Error(data.error || 'Campaign not found');
       }
+
+      console.log('🔄 Fetched campaign data:', {
+        campaignId,
+        totalPool: data.campaign.total_pool,
+        distributedRewards: data.campaign.distributed_rewards,
+        registeredApps: data.campaign.registered_apps_count
+      });
 
       setCampaign(data.campaign);
     } catch (err) {

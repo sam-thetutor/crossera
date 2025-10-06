@@ -72,7 +72,14 @@ export default function CampaignClaimsSection({ campaignId, onClaimSuccess }: Ca
   const fetchCampaignData = async () => {
     try {
       setCampaignLoading(true);
-      const response = await fetch(`/api/campaigns/${campaignId}`);
+      // Add cache-busting timestamp to prevent stale data
+      const timestamp = new Date().getTime();
+      const response = await fetch(`/api/campaigns/${campaignId}?_t=${timestamp}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache'
+        }
+      });
       
       if (!response.ok) {
         const errorData = await response.json();
@@ -80,6 +87,12 @@ export default function CampaignClaimsSection({ campaignId, onClaimSuccess }: Ca
       }
       
       const data = await response.json();
+      
+      console.log('🔄 CampaignClaimsSection fetched data:', {
+        campaignId,
+        totalPool: data.campaign.total_pool,
+        distributedRewards: data.campaign.distributed_rewards
+      });
       
       // Map database fields to expected interface
       const campaign: CampaignData = {
