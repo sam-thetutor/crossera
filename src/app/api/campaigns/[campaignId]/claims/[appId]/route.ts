@@ -190,6 +190,34 @@ export async function POST(
         );
       }
 
+      // Update campaign's distributed_rewards in database
+      // First get current distributed rewards
+      const { data: campaign, error: campaignError } = await supabase
+        .from('campaigns')
+        .select('distributed_rewards')
+        .eq('campaign_id', campaignIdNum)
+        .single();
+
+      if (!campaignError && campaign) {
+        const currentDistributed = parseFloat(campaign.distributed_rewards || '0');
+        const newDistributed = currentDistributed + estimatedReward;
+
+        // Update the campaign with new distributed amount
+        const { error: updateError } = await supabase
+          .from('campaigns')
+          .update({ 
+            distributed_rewards: newDistributed.toString()
+          })
+          .eq('campaign_id', campaignIdNum);
+
+        if (updateError) {
+          console.error('Error updating campaign distributed rewards:', updateError);
+          // Don't fail the request - the claim was successful
+        } else {
+          console.log(`✅ Updated campaign ${campaignIdNum} distributed rewards from ${currentDistributed} to ${newDistributed}`);
+        }
+      }
+
       return NextResponse.json({
         success: true,
         message: 'Rewards claimed successfully',
