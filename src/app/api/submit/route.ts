@@ -29,26 +29,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if transaction already exists in database
-    const { data: existingTx, error: checkError } = await supabase
-      .from('transactions')
-      .select('*')
-      .eq('tx_hash', transaction_hash)
-      .maybeSingle();
-
-    if (checkError) {
-      console.error('Error checking existing transaction:', checkError);
-    }
-
-    if (existingTx) {
-      console.log('Transaction already processed:', transaction_hash);
-      return NextResponse.json({
-        success: true,
-        message: 'Transaction already processed',
-        transaction: existingTx,
-        alreadyProcessed: true
-      });
-    }
+    // Note: We don't check for duplicate tx_hash here because the same transaction
+    // can be recorded multiple times (once per campaign the app is registered for).
+    // The database constraint UNIQUE(tx_hash, campaign_id) allows this.
+    // Individual campaign duplicates are handled later in the insert process.
 
     // Create provider with retry configuration
     const provider = new ethers.JsonRpcProvider(SERVER_CONFIG.rpcUrl, undefined, {
