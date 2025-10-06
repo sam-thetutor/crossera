@@ -382,17 +382,22 @@ function AppClaimCard({ app, campaignId, campaign, onClaimSuccess }: AppClaimCar
         }),
       });
 
+      const recordData = await recordResponse.json();
+      
       if (!recordResponse.ok) {
-        const errorData = await recordResponse.json();
-        console.error('Failed to record claim in database:', errorData);
+        console.error('❌ Failed to record claim in database:');
+        console.error('   Status:', recordResponse.status);
+        console.error('   Error:', recordData);
         
         // Show specific error message for authorization issues
         if (recordResponse.status === 403) {
-          setClaimError(errorData.error || 'You can only claim rewards for your own apps');
+          setClaimError(recordData.error || 'You can only claim rewards for your own apps');
         } else {
           // Don't throw error here - the claim was successful on-chain
-          console.log('Claim was successful on-chain but database recording failed');
+          console.log('⚠️  Claim was successful on-chain but database recording failed');
         }
+      } else {
+        console.log('✅ Claim recorded successfully in database:', recordData);
       }
 
       // Show success message
