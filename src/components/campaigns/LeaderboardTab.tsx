@@ -226,9 +226,6 @@ export function LeaderboardTab({ campaignId }: LeaderboardTabProps) {
                   Project
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Est. Reward
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Fees
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -238,7 +235,7 @@ export function LeaderboardTab({ campaignId }: LeaderboardTabProps) {
                   Txs
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Share
+                  Rewards
                 </th>
               </tr>
             </thead>
@@ -269,13 +266,6 @@ export function LeaderboardTab({ campaignId }: LeaderboardTabProps) {
                     </div>
                   </td>
 
-                  {/* Est. Reward */}
-                  <td className="px-6 py-4 whitespace-nowrap text-right">
-                    <div className="text-sm font-bold text-green-600">
-                      {ethers.formatEther(entry.estimatedReward)} XFI
-                    </div>
-                  </td>
-
                   {/* Fees */}
                   <td className="px-6 py-4 whitespace-nowrap text-right">
                     <div className="text-sm text-gray-900">
@@ -295,11 +285,10 @@ export function LeaderboardTab({ campaignId }: LeaderboardTabProps) {
                     <div className="text-sm text-gray-900">{entry.txCount.toString()}</div>
                   </td>
 
-                  {/* Market Share */}
+                  {/* Total Rewards */}
                   <td className="px-6 py-4 whitespace-nowrap text-right">
-                    <div className="text-sm text-gray-600">
-                      <div>⛽ {entry.feeShare.toFixed(1)}%</div>
-                      <div>📊 {entry.volumeShare.toFixed(1)}%</div>
+                    <div className="text-sm font-bold text-green-600">
+                      {parseFloat(ethers.formatEther(entry.estimatedReward)).toFixed(3)} XFI
                     </div>
                   </td>
                 </tr>

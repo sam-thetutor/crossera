@@ -91,7 +91,8 @@ export default function CampaignClaimsSection({ campaignId }: CampaignClaimsSect
         isActive: getCampaignStatus(data.campaign.start_date, data.campaign.end_date, data.campaign.is_active) === 'active',
         isEnded: getCampaignStatus(data.campaign.start_date, data.campaign.end_date, data.campaign.is_active) === 'ended',
         startDate: data.campaign.start_date,
-        endDate: data.campaign.end_date
+        endDate: data.campaign.end_date,
+        registeredApps: []
       };
       
       setCampaignData(campaign);
@@ -258,6 +259,24 @@ function AppClaimCard({ app, campaignId, campaign, onClaimSuccess }: AppClaimCar
   const { address } = useAccount();
   const [claiming, setClaiming] = useState(false);
   const [claimError, setClaimError] = useState<string | null>(null);
+  const [projectName, setProjectName] = useState<string | null>(null);
+
+  // Fetch project name from database
+  useEffect(() => {
+    const fetchProjectName = async () => {
+      try {
+        const response = await fetch(`/api/projects/${app.appId}`);
+        const data = await response.json();
+        if (data.success && data.project) {
+          setProjectName(data.project.app_name);
+        }
+      } catch (error) {
+        console.error('Error fetching project name:', error);
+      }
+    };
+    
+    fetchProjectName();
+  }, [app.appId]);
 
   const handleClaim = async () => {
     if (!window.ethereum) {
@@ -394,15 +413,17 @@ function AppClaimCard({ app, campaignId, campaign, onClaimSuccess }: AppClaimCar
       <div className="flex items-center justify-between">
         {/* App Name */}
         <div className="flex-1">
-          <h4 className="font-semibold text-white text-lg">{app.appId}</h4>
-          <div className={`text-sm font-medium ${getStatusColor()}`}>
+          <h4 className="font-semibold text-white text-lg">
+            {projectName || 'Loading...'}
+          </h4>
+          {/* <div className={`text-sm font-medium ${getStatusColor()}`}>
             {getStatusText()}
-          </div>
+          </div> */}
         </div>
 
         {/* Fees Generated */}
         <div className="flex-1 text-center">
-          <div className="text-sm text-gray-400 mb-1">Fees Generated</div>
+          <div className="text-sm text-gray-400 mb-1">Fees </div>
           <div className="font-semibold text-white">
             {app.feesGenerated} XFI
           </div>
@@ -410,7 +431,7 @@ function AppClaimCard({ app, campaignId, campaign, onClaimSuccess }: AppClaimCar
 
         {/* Volume Generated */}
         <div className="flex-1 text-center">
-          <div className="text-sm text-gray-400 mb-1">Volume Generated</div>
+          <div className="text-sm text-gray-400 mb-1">Volume </div>
           <div className="font-semibold text-white">
             {app.volumeGenerated} XFI
           </div>

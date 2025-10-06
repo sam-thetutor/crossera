@@ -1,154 +1,185 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ethers } from 'ethers';
+import { supabaseAdmin } from '@/lib/supabase';
 import { SERVER_CONFIG, CROSS_ERA_REWARD_SYSTEM_ABI } from '@/lib/serverConfig';
-import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+const supabase = supabaseAdmin!;
 
+// Helper function to calculate estimated processing time
+function getEstimatedProcessingTime(): string {
+  const now = new Date();
+  const tomorrow = new Date(now);
+  tomorrow.setUTCHours(24, 0, 0, 0); // Next midnight UTC
+  
+  const hoursUntilProcessing = Math.ceil((tomorrow.getTime() - now.getTime()) / (1000 * 60 * 60));
+  
+  return `~${hoursUntilProcessing} hours (next batch runs at 00:00 UTC)`;
+}
+
+// POST /api/sdk/submit - Submit transaction for batch processing
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { transaction_hash, app_id, user_address } = body;
+    const { transactionHash, network, appId, userAddress } = body;
 
     // Validate required fields
-    if (!transaction_hash) {
+    if (!transactionHash) {
       return NextResponse.json(
-        { success: false, error: 'Missing required field: transaction_hash' },
+        { success: false, error: 'Missing required field: transactionHash' },
+        { status: 400 }
+      );
+    }
+
+    if (!network) {
+      return NextResponse.json(
+        { success: false, error: 'Missing required field: network' },
+        { status: 400 }
+      );
+    }
+
+    // Validate network
+    if (!['testnet', 'mainnet'].includes(network)) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid network. Must be "testnet" or "mainnet"' },
         { status: 400 }
       );
     }
 
     // Validate transaction hash format
-    if (!/^0x[a-fA-F0-9]{64}$/.test(transaction_hash)) {
+    if (!/^0x[a-fA-F0-9]{64}$/.test(transactionHash)) {
       return NextResponse.json(
         { success: false, error: 'Invalid transaction hash format' },
         { status: 400 }
       );
     }
 
-    // Create provider for basic validation
-    const provider = new ethers.JsonRpcProvider(SERVER_CONFIG.rpcUrl);
-    const contract = new ethers.Contract(
-      SERVER_CONFIG.contractAddress,
-      CROSS_ERA_REWARD_SYSTEM_ABI,
-      provider
-    );
-
-    // Check if transaction hash already exists in SDK pending transactions
-    const { data: existingTransaction } = await supabase
+    // Check if transaction already submitted for this network
+    const { data: existing } = await supabase
       .from('sdk_pending_transactions')
-      .select('id, status')
-      .eq('tx_hash', transaction_hash)
-      .single();
+      .select('id, status, submitted_at, network')
+      .eq('transaction_hash', transactionHash)
+      .eq('network', network)
+      .maybeSingle();
 
-    if (existingTransaction) {
+    if (existing) {
       return NextResponse.json(
         { 
           success: false, 
-          error: 'Transaction already submitted for batch processing',
+          error: `Transaction already submitted for batch processing on ${network}`,
           data: {
-            status: existingTransaction.status,
-            submitted_at: existingTransaction.created_at
+            transaction_hash: transactionHash,
+            network: existing.network,
+            status: existing.status,
+            submitted_at: existing.submitted_at,
+            estimated_processing_time: getEstimatedProcessingTime()
           }
         },
         { status: 409 }
       );
     }
 
-    // Check if transaction has already been processed on-chain
-    const isProcessed = await contract.processedTransactions(transaction_hash);
-    if (isProcessed) {
-      return NextResponse.json(
-        { success: false, error: 'Transaction already processed on-chain' },
-        { status: 409 }
-      );
-    }
+    // Get network configuration
+    const networkConfig = network === 'mainnet' 
+      ? { 
+          rpcUrl: SERVER_CONFIG.rpcUrl, 
+          contractAddress: SERVER_CONFIG.contractAddress 
+        }
+      : { 
+          rpcUrl: process.env.TESTNET_RPC_URL || SERVER_CONFIG.rpcUrl, 
+          contractAddress: process.env.TESTNET_CONTRACT_ADDRESS || SERVER_CONFIG.contractAddress 
+        };
 
-    // Get transaction details from blockchain for validation
-    const tx = await provider.getTransaction(transaction_hash);
-    if (!tx) {
-      return NextResponse.json(
-        { success: false, error: 'Transaction not found on blockchain' },
-        { status: 404 }
-      );
-    }
+    // Extract app_id from transaction if not provided
+    let extractedAppId = appId;
+    let extractedUserAddress = userAddress;
 
-    // Get transaction receipt
-    const receipt = await provider.getTransactionReceipt(transaction_hash);
-    if (!receipt) {
-      return NextResponse.json(
-        { success: false, error: 'Transaction receipt not found. Transaction may not be confirmed yet.' },
-        { status: 404 }
-      );
-    }
-
-    // Extract app_id from transaction data if not provided
-    let finalAppId = app_id;
-    if (!finalAppId) {
+    if (!extractedAppId || !extractedUserAddress) {
       try {
-        if (!tx.data || tx.data === '0x') {
+        const provider = new ethers.JsonRpcProvider(networkConfig.rpcUrl);
+        const tx = await provider.getTransaction(transactionHash);
+        
+        if (!tx) {
           return NextResponse.json(
-            { success: false, error: 'Transaction data is empty. No app_id found.' },
-            { status: 400 }
+            { success: false, error: 'Transaction not found on blockchain' },
+            { status: 404 }
           );
         }
-        
-        // Decode UTF-8 string from hex data
-        finalAppId = ethers.toUtf8String(tx.data);
-        
-        if (!finalAppId || finalAppId.trim().length === 0) {
-          return NextResponse.json(
-            { success: false, error: 'Could not extract app_id from transaction data' },
-            { status: 400 }
-          );
+
+        // Extract app_id from transaction data
+        if (!extractedAppId && tx.data && tx.data !== '0x') {
+          try {
+            extractedAppId = ethers.toUtf8String(tx.data);
+          } catch (e) {
+            console.error('Error decoding app_id from tx.data:', e);
+          }
         }
-      } catch (decodeError) {
-        console.error('Error decoding app_id:', decodeError);
+
+        // Extract user address from transaction
+        if (!extractedUserAddress) {
+          extractedUserAddress = tx.from;
+        }
+      } catch (error) {
+        console.error('Error extracting transaction data:', error);
         return NextResponse.json(
-          { success: false, error: 'Failed to decode app_id from transaction data' },
+          { success: false, error: 'Failed to extract transaction data from blockchain' },
           { status: 400 }
         );
       }
     }
 
-    // Check if app is registered on-chain
-    const isAppRegistered = await contract.registeredApps(finalAppId);
-    if (!isAppRegistered) {
+    if (!extractedAppId) {
       return NextResponse.json(
-        { success: false, error: `App "${finalAppId}" is not registered on-chain` },
-        { status: 404 }
+        { success: false, error: 'Could not extract app_id from transaction. Please provide appId parameter.' },
+        { status: 400 }
       );
     }
 
-    // Get final user address
-    const finalUserAddress = user_address || tx.from.toLowerCase();
-
-    // Get project ID from app_id
-    const { data: project } = await supabase
-      .from('projects')
-      .select('id')
-      .eq('app_id', finalAppId)
-      .single();
-
-    if (!project) {
-      return NextResponse.json(
-        { success: false, error: `Project not found for app_id: ${finalAppId}` },
-        { status: 404 }
-      );
+    // Look up project_id from app_id (optional - makes data more complete)
+    let projectId = null;
+    try {
+      const { data: project } = await supabase
+        .from('projects')
+        .select('id')
+        .eq('app_id', extractedAppId)
+        .maybeSingle();
+      
+      if (project) {
+        projectId = project.id;
+      }
+    } catch (error) {
+      console.log('Could not look up project_id, will be set during batch processing');
     }
 
-    // Save to SDK pending transactions table
-    const { data: savedTransaction, error: dbError } = await supabase
+    // Verify app is registered on-chain (early validation to catch issues before batch processing)
+    try {
+      const provider = new ethers.JsonRpcProvider(networkConfig.rpcUrl);
+      const contract = new ethers.Contract(
+        networkConfig.contractAddress,
+        CROSS_ERA_REWARD_SYSTEM_ABI,
+        provider
+      );
+      
+      const isRegistered = await contract.registeredApps(extractedAppId);
+      if (!isRegistered) {
+        return NextResponse.json(
+          { success: false, error: `App "${extractedAppId}" is not registered on-chain on ${network}` },
+          { status: 400 }
+        );
+      }
+    } catch (error) {
+      console.error('Error verifying app registration:', error);
+      // Continue anyway - will be checked during batch processing
+    }
+
+    // Store transaction for batch processing
+    const { data: pendingTx, error: insertError } = await supabase
       .from('sdk_pending_transactions')
       .insert({
-        tx_hash: transaction_hash,
-        app_id: finalAppId,
-        project_id: project.id,
-        user_address: finalUserAddress,
-        submitted_at: new Date().toISOString(),
+        transaction_hash: transactionHash,
+        app_id: extractedAppId,
+        project_id: projectId, // Will be null if project not found, populated during batch processing
+        user_address: extractedUserAddress?.toLowerCase(),
+        network: network,
         status: 'pending',
         retry_count: 0,
         max_retries: 3
@@ -156,39 +187,33 @@ export async function POST(request: NextRequest) {
       .select()
       .single();
 
-    if (dbError) {
-      console.error('Database error saving SDK transaction:', dbError);
+    if (insertError) {
+      console.error('Error storing pending transaction:', insertError);
       return NextResponse.json(
-        { success: false, error: 'Failed to save transaction for batch processing' },
+        { success: false, error: 'Failed to store transaction for processing' },
         { status: 500 }
       );
     }
-
-    console.log('SDK transaction submitted for batch processing:', {
-      tx_hash: transaction_hash,
-      app_id: finalAppId,
-      user_address: finalUserAddress,
-      project_id: project.id
-    });
 
     return NextResponse.json({
       success: true,
       message: 'Transaction submitted for batch processing',
       data: {
-        transaction_hash: transaction_hash,
-        app_id: finalAppId,
-        user_address: finalUserAddress,
-        status: 'pending',
-        estimated_processing_time: 'Next daily batch run',
-        submitted_at: savedTransaction.created_at,
-        id: savedTransaction.id
+        id: pendingTx.id,
+        transaction_hash: pendingTx.transaction_hash,
+        app_id: pendingTx.app_id,
+        user_address: pendingTx.user_address,
+        network: pendingTx.network,
+        status: pendingTx.status,
+        submitted_at: pendingTx.submitted_at,
+        estimated_processing_time: getEstimatedProcessingTime()
       }
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('SDK submit error:', error);
     return NextResponse.json(
-      { success: false, error: 'Internal server error' },
+      { success: false, error: error.message || 'Internal server error' },
       { status: 500 }
     );
   }

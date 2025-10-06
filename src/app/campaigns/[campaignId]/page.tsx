@@ -108,15 +108,37 @@ export default function CampaignDetailsPage() {
     }
   };
 
+  // Format wei values to XFI with proper decimals
+  const formatPoolValue = (weiValue: string, decimals: number = 3): string => {
+    try {
+      return parseFloat(ethers.formatEther(weiValue)).toFixed(decimals);
+    } catch (e) {
+      return '0.000';
+    }
+  };
+
   const calculateRemainingPool = () => {
-    if (!campaign) return '0';
-    const remaining = parseFloat(campaign.total_pool) - parseFloat(campaign.distributed_rewards);
-    return remaining.toFixed(2);
+    if (!campaign) return '0.000';
+    try {
+      const totalWei = BigInt(campaign.total_pool);
+      const distributedWei = BigInt(campaign.distributed_rewards);
+      const remainingWei = totalWei - distributedWei;
+      return parseFloat(ethers.formatEther(remainingWei)).toFixed(3);
+    } catch (e) {
+      return '0.000';
+    }
   };
 
   const calculateDistributionPercentage = () => {
-    if (!campaign || parseFloat(campaign.total_pool) === 0) return 0;
-    return (parseFloat(campaign.distributed_rewards) / parseFloat(campaign.total_pool) * 100).toFixed(1);
+    if (!campaign) return '0.0';
+    try {
+      const totalWei = BigInt(campaign.total_pool);
+      const distributedWei = BigInt(campaign.distributed_rewards);
+      if (totalWei === BigInt(0)) return '0.0';
+      return (Number(distributedWei * BigInt(1000) / totalWei) / 10).toFixed(1);
+    } catch (e) {
+      return '0.0';
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -372,7 +394,7 @@ export default function CampaignDetailsPage() {
                   <span className="text-xs font-medium text-gray-400">Total Pool</span>
                   <span className="text-xl">💰</span>
                 </div>
-                <p className="text-xl font-bold text-white">{campaign.total_pool} XFI</p>
+                <p className="text-xl font-bold text-white">{formatPoolValue(campaign.total_pool)} XFI</p>
               </div>
 
               <div className="glass-card p-4">
@@ -380,7 +402,7 @@ export default function CampaignDetailsPage() {
                   <span className="text-xs font-medium text-gray-400">Distributed</span>
                   <span className="text-xl">📊</span>
                 </div>
-                <p className="text-xl font-bold text-green-600">{campaign.distributed_rewards} XFI</p>
+                <p className="text-xl font-bold text-green-600">{formatPoolValue(campaign.distributed_rewards)} XFI</p>
                 <p className="text-xs text-gray-400 mt-1">{calculateDistributionPercentage()}%</p>
               </div>
 
@@ -493,15 +515,15 @@ export default function CampaignDetailsPage() {
                       <div className="grid grid-cols-3 gap-4 text-center">
                         <div>
                           <p className="text-xs text-gray-400">Total Pool</p>
-                          <p className="text-lg font-bold text-white">{campaign.total_pool}</p>
+                          <p className="text-lg font-bold text-white">{formatPoolValue(campaign.total_pool)} XFI</p>
                         </div>
                         <div>
                           <p className="text-xs text-gray-400">Distributed</p>
-                          <p className="text-lg font-bold text-green-600">{campaign.distributed_rewards}</p>
+                          <p className="text-lg font-bold text-green-600">{formatPoolValue(campaign.distributed_rewards)} XFI</p>
                         </div>
                         <div>
                           <p className="text-xs text-gray-400">Remaining</p>
-                          <p className="text-lg font-bold text-blue-600">{calculateRemainingPool()}</p>
+                          <p className="text-lg font-bold text-blue-600">{calculateRemainingPool()} XFI</p>
                         </div>
                       </div>
                     </div>
