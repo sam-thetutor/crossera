@@ -64,29 +64,9 @@ export async function POST(
 
     if (regError) throw regError;
 
-    // Increment campaign's registered_apps_count
-    const { error: updateError } = await supabase.rpc('increment', {
-      table_name: 'campaigns',
-      column_name: 'registered_apps_count',
-      row_id: campaign_id,
-      id_column: 'campaign_id'
-    });
-
-    // If RPC function doesn't exist, fallback to manual increment
-    if (updateError) {
-      const { data: campaign } = await supabase
-        .from('campaigns')
-        .select('registered_apps_count')
-        .eq('campaign_id', campaign_id)
-        .single();
-
-      if (campaign) {
-        await supabase
-          .from('campaigns')
-          .update({ registered_apps_count: (campaign.registered_apps_count || 0) + 1 })
-          .eq('campaign_id', campaign_id);
-      }
-    }
+    // Note: registered_apps_count is automatically incremented by database trigger
+    // The trigger 'increment_campaign_apps_count' fires on INSERT to project_campaigns
+    // See: database schema trigger definition
 
     return NextResponse.json({
       success: true,
