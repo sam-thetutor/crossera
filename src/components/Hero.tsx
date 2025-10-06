@@ -88,7 +88,7 @@ export function Hero() {
               {/* Live Stats Overlay */}
               <div className="mt-4 grid grid-cols-3 gap-3">
                 <div className="glass-button text-white rounded-lg p-3 text-center">
-                  <p className="text-xs text-gray-300">Active Campaigns</p>
+                  <p className="text-xs text-gray-300">Active Projects</p>
                   <p className="mt-1 text-lg font-semibold text-white">
                     {loading ? "—" : activeProjects}
                   </p>
@@ -100,7 +100,7 @@ export function Hero() {
                   </p>
                 </div>
                 <div className="glass-button text-white rounded-lg p-3 text-center">
-                  <p className="text-xs text-gray-300">Rewards</p>
+                  <p className="text-xs text-gray-300">Total Rewards</p>
                   <p className="mt-1 text-lg font-semibold text-white">
                     {loading ? "—" : `${Number(totalRewards).toFixed(2)} XFI`}
                   </p>
