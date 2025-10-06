@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { ethers } from 'ethers';
 import { useWallet } from '@/contexts/WalletContext';
 import { NetworkWarning } from '@/components/shared/NetworkWarning';
 import { CampaignCardSkeleton } from '@/components/shared/CampaignCardSkeleton';
@@ -29,6 +30,16 @@ export default function CampaignsPage() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'active' | 'ended'>('all');
+
+  // Format wei values to XFI with decimals
+  const formatXFI = (weiValue: string): string => {
+    try {
+      if (!weiValue || weiValue === '0') return '0.000';
+      return parseFloat(ethers.formatEther(weiValue)).toFixed(3);
+    } catch (error) {
+      return '0.000';
+    }
+  };
 
   useEffect(() => {
     fetchCampaigns();
@@ -224,11 +235,11 @@ export default function CampaignsPage() {
                   <div className="space-y-2 mb-4">
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-400">Total Pool</span>
-                      <span className="font-semibold text-white">{campaign.total_pool} XFI</span>
+                      <span className="font-semibold text-white">{formatXFI(campaign.total_pool)} XFI</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-400">Distributed</span>
-                      <span className="font-semibold text-white">{campaign.distributed_rewards} XFI</span>
+                      <span className="font-semibold text-white">{formatXFI(campaign.distributed_rewards)} XFI</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-400">Registered Apps</span>
