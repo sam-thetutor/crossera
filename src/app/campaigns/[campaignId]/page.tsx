@@ -538,7 +538,10 @@ export default function CampaignDetailsPage() {
                 )}
 
                 {activeTab === 'claims' && campaign && isConnected && (
-                  <CampaignClaimsSection campaignId={campaign.campaign_id} />
+                  <CampaignClaimsSection 
+                    campaignId={campaign.campaign_id}
+                    onClaimSuccess={fetchCampaign}
+                  />
                 )}
 
                 {activeTab === 'claims' && !isConnected && (

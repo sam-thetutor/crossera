@@ -46,9 +46,10 @@ interface CampaignData {
 
 interface CampaignClaimsSectionProps {
   campaignId: number;
+  onClaimSuccess?: () => void;
 }
 
-export default function CampaignClaimsSection({ campaignId }: CampaignClaimsSectionProps) {
+export default function CampaignClaimsSection({ campaignId, onClaimSuccess }: CampaignClaimsSectionProps) {
   const { address } = useAccount();
   const { 
     getCampaignData, 

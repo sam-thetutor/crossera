@@ -215,7 +215,8 @@ export async function POST(
 
           if (updateError) {
             console.error('❌ Error updating campaign distributed rewards:', updateError);
-            // Don't fail the request - the claim was successful
+            console.error('🔄 Attempting to sync from blockchain...');
+            await syncCampaignFromBlockchain(campaignIdNum);
           } else {
             console.log(`✅ Updated campaign ${campaignIdNum} distributed rewards:`);
             console.log(`   From: ${currentDistributedWei.toString()} wei (${ethers.formatEther(currentDistributedWei)} XFI)`);
@@ -224,10 +225,42 @@ export async function POST(
           }
         } catch (bigIntError) {
           console.error('❌ Error calculating distributed rewards with BigInt:', bigIntError);
+          console.error('   Database value:', campaign.distributed_rewards);
+          console.error('   This indicates corrupted data (decimal instead of wei)');
+          console.error('🔄 Syncing from blockchain to fix corrupted data...');
+          
+          // Fallback: Sync from blockchain to fix corrupted database
+          try {
+            await syncCampaignFromBlockchain(campaignIdNum);
+            console.log('✅ Campaign synced from blockchain successfully');
+          } catch (syncError) {
+            console.error('❌ Failed to sync from blockchain:', syncError);
+          }
         }
       } else if (campaignError) {
         console.error('❌ Error fetching campaign for distributed update:', campaignError);
       }
+
+// Helper function to sync campaign from blockchain
+async function syncCampaignFromBlockchain(campaignId: number) {
+  try {
+    const contractCampaign = await contract.getCampaign(campaignId);
+    
+    await supabase
+      .from('campaigns')
+      .update({
+        total_pool: contractCampaign.totalPool.toString(),
+        distributed_rewards: contractCampaign.distributedRewards.toString(),
+        is_active: contractCampaign.active
+      })
+      .eq('campaign_id', campaignId);
+    
+    console.log(`✅ Synced campaign ${campaignId} from blockchain`);
+  } catch (error) {
+    console.error(`❌ Failed to sync campaign ${campaignId}:`, error);
+    throw error;
+  }
+}
 
       return NextResponse.json({
         success: true,
