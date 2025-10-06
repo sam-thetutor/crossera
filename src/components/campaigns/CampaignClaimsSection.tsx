@@ -235,8 +235,19 @@ export default function CampaignClaimsSection({ campaignId, onClaimSuccess }: Ca
                   campaign={campaignData}
                   onClaimSuccess={async () => {
                     // Wait a moment for database to update, then refresh data
-                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    console.log('🔄 Claim successful, refreshing data...');
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    
+                    // Refresh claims section data
                     refresh();
+                    fetchCampaignData();
+                    
+                    // Call parent callback to refresh campaign details page
+                    if (onClaimSuccess) {
+                      console.log('🔄 Calling parent onClaimSuccess callback...');
+                      await onClaimSuccess();
+                      console.log('✅ Parent page refreshed');
+                    }
                   }}
                 />
               ))}
